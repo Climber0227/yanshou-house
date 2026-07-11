@@ -1,0 +1,46 @@
+{
+  "pages": [
+    {"path": "pages/index/index", "style": {"navigationBarTitleText": "工作台"}},
+    {"path": "pages/scan-result/scan-result", "style": {"navigationBarTitleText": "户信息"}},
+    {"path": "pages/report/report", "style": {"navigationBarTitleText": "问题上报"}},
+    {"path": "pages/batch-report/batch-report", "style": {"navigationBarTitleText": "批量上报"}},
+    {"path": "pages/issue-detail/issue-detail", "style": {"navigationBarTitleText": "问题详情"}},
+    {"path": "pages/rectify/rectify", "style": {"navigationBarTitleText": "整改"}},
+    {"path": "pages/review/review", "style": {"navigationBarTitleText": "复查确认"}},
+    {"path": "pages/household/household", "style": {"navigationBarTitleText": "一户一档"}},
+    {"path": "pages/mine/mine", "style": {"navigationBarTitleText": "我的"}},
+    {"path": "pages/task-list/task-list", "style": {"navigationBarTitleText": "任务列表"}},
+    {"path": "pages/notifications/notifications", "style": {"navigationBarTitleText": "通知"}}
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "分户验收",
+    "navigationBarBackgroundColor": "#1E3A5F",
+    "backgroundColor": "#F8F9FC",
+    "usingComponents": {}
+  },
+  "tabBar": {
+    "color": "#94A3B8",
+    "selectedColor": "#1A56DB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "工作台"
+      },
+      {
+        "pagePath": "pages/task-list/task-list",
+        "text": "任务"
+      },
+      {
+        "pagePath": "pages/household/household",
+        "text": "档案"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
+  }
+}
