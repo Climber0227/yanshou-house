@@ -159,6 +159,11 @@ textarea {
 .tag-closed { background: #E8F5E9; color: #2E7D32; }
 .tag-rejected { background: #FFEBEE; color: #ED3241; }
 
+// 状态标签颜色过渡
+.tag, .tag-pending, .tag-progress, .tag-review, .tag-closed, .tag-rejected {
+  transition: all 0.3s ease;
+}
+
 // 主按钮
 .btn-primary {
   background: $primary;

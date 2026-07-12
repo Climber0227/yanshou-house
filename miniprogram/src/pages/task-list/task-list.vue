@@ -81,10 +81,6 @@ onShow(() => {
 
 <style scoped>
 .page { padding: 0 16px 20px; }
-.seg { display: flex; gap: 4px; background: #F0F1F5; border-radius: 10px; padding: 3px; margin: 12px 0; }
-.seg-item { flex: 1; text-align: center; padding: 7px 0; border-radius: 8px; font-size: 12px; color: #71727A; }
-.seg-item.active { background: #fff; color: #006FFD; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-
 .card { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 14px; margin-bottom: 8px; }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .card-info { flex: 1; min-width: 0; }
@@ -93,11 +89,5 @@ onShow(() => {
 .card-foot { display: flex; gap: 16px; margin-top: 8px; }
 .card-foot-text { font-size: 10px; color: #8F9098; }
 .card-foot-text.over { color: #ED3241; font-weight: 500; }
-
-.tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }
-.tag-pending { background: #FFF3E0; color: #E65100; }
-.tag-progress { background: #EAF2FF; color: #006FFD; }
-.tag-review { background: #F3E8FF; color: #7C3AED; }
-.tag-closed { background: #E8F5E9; color: #2E7D32; }
 .empty { padding: 60px 0; text-align: center; color: #8F9098; font-size: 13px; }
 </style>

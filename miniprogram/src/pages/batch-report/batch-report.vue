@@ -34,9 +34,9 @@
     <!-- 验收类型 -->
     <view class="form-group">
       <text class="form-label">验收类型</text>
-      <view class="seg-lg">
+      <view class="seg">
         <view v-for="t in types" :key="t.value"
-          class="seg-item-lg" :class="{ active: form.type === t.value }"
+          class="seg-item" :class="{ active: form.type === t.value }"
           @click="form.type = t.value; form.description = ''; loadPresets()">
           <text>{{ t.label }}</text>
         </view>
@@ -207,10 +207,6 @@ onMounted(() => { loadBuildings(); loadPresets() })
 .hh-info { color: $text-primary; }
 
 /* 类型 */
-.seg-lg { display: flex; gap: 6px; }
-.seg-item-lg { flex: 1; text-align: center; padding: 10px; border-radius: $radius-sm; border: 1px solid $border; font-size: $fs-sm; color: $text-secondary; }
-.seg-item-lg.active { background: $primary-light; color: $primary; border-color: $primary; font-weight: 600; }
-
 /* 预设 */
 .preset-r { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: $sp-sm; }
 .preset-item { padding: 6px 12px; border: 1px solid $border; border-radius: 4px; font-size: $fs-xs; color: $text-secondary; }
