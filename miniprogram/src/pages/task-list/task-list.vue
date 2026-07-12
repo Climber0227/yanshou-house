@@ -82,7 +82,7 @@ onShow(() => {
 
 <style scoped>
 .page { padding: 0 16px 20px; }
-.card { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.card { padding: 14px; margin-bottom: 8px; }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .card-info { flex: 1; min-width: 0; }
 .card-title { font-size: 14px; font-weight: 600; color: #1F2024; display: block; }
