@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view v-if="loading" class="empty"><text>加载中...</text></view>
+    <Skeleton v-if="loading" type="detail" />
     <template v-else-if="issue">
       <!-- 问题基本信息 -->
       <view class="card-accent">
@@ -54,6 +54,7 @@ import { ref, computed } from 'vue'
 import { onLoad, onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getIssueDetail, getIssueTimeline, startRectify as startApi } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const userRole = computed(() => store.user?.role || '')

@@ -16,18 +16,21 @@
   </view>
 
   <!-- 统计 -->
-  <view class="stat-row">
-    <view class="stat-cell"><text class="stat-num">{{ stats.totalHouseholds }}</text><text class="stat-lbl">总户数</text></view>
-    <view class="stat-cell"><text class="stat-num blue">{{ stats.checkedHouseholds }}</text><text class="stat-lbl">已排查</text></view>
-    <view class="stat-cell"><text class="stat-num">{{ stats.totalIssues }}</text><text class="stat-lbl">问题总数</text></view>
-    <view class="stat-cell"><text class="stat-num green">{{ stats.closedCount }}</text><text class="stat-lbl">已闭环</text></view>
-  </view>
-  <view class="stat-row">
-    <view class="stat-cell"><text class="stat-num warn">{{ stats.pendingCount }}</text><text class="stat-lbl">待整改</text></view>
-    <view class="stat-cell"><text class="stat-num blue">{{ stats.rectifyingCount }}</text><text class="stat-lbl">整改中</text></view>
-    <view class="stat-cell"><text class="stat-num purple">{{ stats.pendingReviewCount }}</text><text class="stat-lbl">待复查</text></view>
-    <view class="stat-cell"><text class="stat-num" :class="stats.rectifyRate >= 0.8 ? 'green' : 'warn'">{{ (stats.rectifyRate * 100).toFixed(0) }}%</text><text class="stat-lbl">完成率</text></view>
-  </view>
+  <Skeleton v-if="loading" type="stat" :count="4" />
+  <template v-else>
+    <view class="stat-row">
+      <view class="stat-cell"><text class="stat-num">{{ stats.totalHouseholds }}</text><text class="stat-lbl">总户数</text></view>
+      <view class="stat-cell"><text class="stat-num blue">{{ stats.checkedHouseholds }}</text><text class="stat-lbl">已排查</text></view>
+      <view class="stat-cell"><text class="stat-num">{{ stats.totalIssues }}</text><text class="stat-lbl">问题总数</text></view>
+      <view class="stat-cell"><text class="stat-num green">{{ stats.closedCount }}</text><text class="stat-lbl">已闭环</text></view>
+    </view>
+    <view class="stat-row">
+      <view class="stat-cell"><text class="stat-num warn">{{ stats.pendingCount }}</text><text class="stat-lbl">待整改</text></view>
+      <view class="stat-cell"><text class="stat-num blue">{{ stats.rectifyingCount }}</text><text class="stat-lbl">整改中</text></view>
+      <view class="stat-cell"><text class="stat-num purple">{{ stats.pendingReviewCount }}</text><text class="stat-lbl">待复查</text></view>
+      <view class="stat-cell"><text class="stat-num" :class="stats.rectifyRate >= 0.8 ? 'green' : 'warn'">{{ (stats.rectifyRate * 100).toFixed(0) }}%</text><text class="stat-lbl">完成率</text></view>
+    </view>
+  </template>
 
   <!-- 快速入口 -->
   <view class="quick-acts">
@@ -58,6 +61,7 @@ import { ref, computed, onMounted } from 'vue'
 import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getStatistics, getRectifyTasks, getPendingReviews, getNotifications } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const user = computed(() => store.user)
@@ -66,11 +70,13 @@ const role = computed(() => store.user?.role || '')
 const stats = ref({ totalHouseholds: 0, pendingCount: 0, rectifyingCount: 0, closedCount: 0 })
 const myIssues = ref([])
 const unread = ref(0)
+const loading = ref(false)
 
 const dotMap = { pending:'dot-warn', rectifying:'dot-blue', pending_review:'dot-purple', closed:'dot-green' }
 const tagMap = { pending:'tag-pending', rectifying:'tag-progress', pending_review:'tag-review', closed:'tag-closed' }
 
 async function load() {
+  loading.value = true
   const [s, t, r, n] = await Promise.all([
     getStatistics(), getRectifyTasks('pending,rectifying'), getPendingReviews(), getNotifications()
   ])
@@ -85,6 +91,7 @@ async function load() {
   if (!role.value && t.code === 0) list = (t.data.list || [])
   myIssues.value = list.slice(0, 10)
   if (n.code === 0) unread.value = (n.data.list || []).filter(x => !x.isRead).length
+  loading.value = false
 }
 
 function goDetail(i) { uni.navigateTo({ url: '/pages/issue-detail/issue-detail?id=' + i.id }) }

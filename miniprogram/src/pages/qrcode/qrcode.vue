@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <view v-if="loading" class="loading-state"><text>加载中...</text></view>
+    <Skeleton v-if="loading" type="card" />
     <template v-else-if="household">
       <view class="qr-card">
         <text class="qr-title">{{ household.buildingName }} {{ household.unitName }} {{ household.floor }}层 {{ household.room }}</text>
@@ -46,6 +46,7 @@
 import { ref, nextTick } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getHouseholdDetail } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const loading = ref(true)
 const household = ref(null)

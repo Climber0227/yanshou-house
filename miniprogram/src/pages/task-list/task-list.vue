@@ -9,7 +9,7 @@
     </view>
   </view>
 
-  <view v-if="loading" class="empty"><text>加载中...</text></view>
+  <Skeleton v-if="loading" type="card" :count="4" />
   <template v-else>
     <view v-for="i in list" :key="i.id" class="card" @click="goDetail(i)">
       <view class="card-top">
@@ -36,6 +36,7 @@ import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getRectifyTasks, getPendingReviews } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const role = computed(() => store.user?.role || '')

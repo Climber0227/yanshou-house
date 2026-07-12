@@ -18,7 +18,7 @@
       <text>共 {{ total }} 项问题</text>
     </view>
 
-    <view v-if="loading" class="empty"><text>加载中...</text></view>
+    <Skeleton v-if="loading" type="card" :count="4" />
     <template v-else>
       <view v-for="i in list" :key="i.id" class="card" @click="goDetail(i)">
         <view class="card-top">
@@ -43,6 +43,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getBuildings, getAllIssues } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const buildings = ref([])
 const list = ref([])

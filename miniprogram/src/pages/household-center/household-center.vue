@@ -1,7 +1,7 @@
 <template>
 <view class="page">
   <!-- 数据加载中 -->
-  <view v-if="loading" class="empty"><text>加载中...</text></view>
+  <Skeleton v-if="loading" type="card" :count="4" />
 
   <!-- 选择器模式 -->
   <template v-else-if="showSelector">
@@ -118,6 +118,7 @@ import { ref, computed } from 'vue'
 import { onLoad, onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getHouseholdByQr, getHouseholdDetail, getBuildings, getUnits, getHouseholds, acceptHousehold } from '@/api'
+import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const userRole = computed(() => store.user?.role || '')
