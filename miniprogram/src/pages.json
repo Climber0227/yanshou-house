@@ -1,46 +1,35 @@
 {
   "pages": [
     {"path": "pages/index/index", "style": {"navigationBarTitleText": "工作台"}},
-    {"path": "pages/scan-result/scan-result", "style": {"navigationBarTitleText": "户信息"}},
-    {"path": "pages/report/report", "style": {"navigationBarTitleText": "问题上报"}},
+    {"path": "pages/task-list/task-list", "style": {"navigationBarTitleText": "任务"}},
+    {"path": "pages/scan-center/scan-center", "style": {"navigationBarTitleText": "扫码验房"}},
+    {"path": "pages/mine/mine", "style": {"navigationBarTitleText": "我的"}},
+    {"path": "pages/household-center/household-center", "style": {"navigationBarTitleText": "户操作"}},
     {"path": "pages/batch-report/batch-report", "style": {"navigationBarTitleText": "批量上报"}},
     {"path": "pages/issue-detail/issue-detail", "style": {"navigationBarTitleText": "问题详情"}},
     {"path": "pages/rectify/rectify", "style": {"navigationBarTitleText": "整改"}},
     {"path": "pages/review/review", "style": {"navigationBarTitleText": "复查确认"}},
-    {"path": "pages/household/household", "style": {"navigationBarTitleText": "一户一档"}},
-    {"path": "pages/mine/mine", "style": {"navigationBarTitleText": "我的"}},
-    {"path": "pages/task-list/task-list", "style": {"navigationBarTitleText": "任务列表"}},
-    {"path": "pages/notifications/notifications", "style": {"navigationBarTitleText": "通知"}}
+    {"path": "pages/qrcode/qrcode", "style": {"navigationBarTitleText": "户二维码"}},
+    {"path": "pages/notifications/notifications", "style": {"navigationBarTitleText": "通知"}},
+    {"path": "pages/inspect/inspect", "style": {"navigationBarTitleText": "房屋检查"}},
+    {"path": "pages/problem-library/problem-library", "style": {"navigationBarTitleText": "问题库"}}
   ],
   "globalStyle": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "分户验收",
-    "navigationBarBackgroundColor": "#1E3A5F",
-    "backgroundColor": "#F8F9FC",
-    "usingComponents": {}
+    "navigationBarBackgroundColor": "#006FFD",
+    "backgroundColor": "#F8F9FE"
   },
   "tabBar": {
-    "color": "#94A3B8",
-    "selectedColor": "#1A56DB",
+    "color": "#8F9098",
+    "selectedColor": "#006FFD",
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "工作台"
-      },
-      {
-        "pagePath": "pages/task-list/task-list",
-        "text": "任务"
-      },
-      {
-        "pagePath": "pages/household/household",
-        "text": "档案"
-      },
-      {
-        "pagePath": "pages/mine/mine",
-        "text": "我的"
-      }
+      {"pagePath": "pages/index/index", "text": "首页", "iconPath": "static/icons/首页.png", "selectedIconPath": "static/icons/首页.png"},
+      {"pagePath": "pages/task-list/task-list", "text": "任务", "iconPath": "static/icons/任务 (1).png", "selectedIconPath": "static/icons/任务 (1).png"},
+      {"pagePath": "pages/scan-center/scan-center", "text": "扫码", "iconPath": "static/icons/扫码.png", "selectedIconPath": "static/icons/扫码.png"},
+      {"pagePath": "pages/mine/mine", "text": "我的", "iconPath": "static/icons/我的-copy.png", "selectedIconPath": "static/icons/我的-copy.png"}
     ]
   }
 }

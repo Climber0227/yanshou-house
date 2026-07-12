@@ -7,6 +7,15 @@ const delay = (ms = 200) => new Promise(r => setTimeout(r, ms))
 const ok = (res) => ({ code: 0, message: 'success', data: res })
 const fail = (code, message) => ({ code, message, data: null })
 
+// 从缓存获取当前用户
+function getCurrentUser() {
+  try {
+    const raw = uni.getStorageSync('user')
+    if (raw) return JSON.parse(raw)
+  } catch {}
+  return { id: 'u_001', nickname: '张查验', role: 'inspector', roleName: '查验员' }
+}
+
 // 从 localStorage 获取 token
 function getToken() {
   try { return uni.getStorageSync('token') } catch { return '' }
@@ -46,6 +55,13 @@ export async function mockGetHouseholds(buildingId, unitId, floor) {
   await delay(200)
   let list = [...data.mockHouseholds]
   if (buildingId) list = list.filter(h => h.buildingId === buildingId)
+  if (unitId) list = list.filter(h => h.unitId === unitId)
+  if (floor) list = list.filter(h => h.floor === floor)
+  // 计算真实问题数
+  list = list.map(h => ({
+    ...h,
+    issueCount: data.mockIssues.filter(i => i.householdId === h.id).length
+  }))
   return ok({ list })
 }
 
@@ -79,18 +95,84 @@ export async function mockGetIssuePresets(type) {
   return ok({ list: presets })
 }
 
+function addNotification(type, title, content, issueId) {
+  data.mockNotifications.unshift({
+    id: 'not_auto_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    type,
+    title,
+    content,
+    issueId,
+    isRead: false,
+    createdAt: new Date().toISOString()
+  })
+}
+
+function getHouseholdName(id) {
+  const h = data.mockHouseholds.find(x => x.id === id)
+  return h ? h.name : ''
+}
+
 export async function mockReportIssue(form) {
   await delay(300)
-  return ok({ id: 'iss_new_' + Date.now(), status: 'pending', statusName: '待整改' })
+  const cur = getCurrentUser()
+  const newIssue = {
+    id: 'iss_new_' + Date.now(),
+    householdId: form.householdId,
+    householdName: getHouseholdName(form.householdId),
+    type: form.type,
+    typeName: form.type === 'visual' ? '观感' : form.type === 'measure' ? '实测' : '公区',
+    category: form.category || '',
+    description: form.description,
+    status: 'pending', statusName: '待整改',
+    photos: form.photos || [],
+    reporter: cur.nickname, reporterId: cur.id,
+    rectifier: form.rectifierName || '', rectifierId: '',
+    rectifierPhone: form.rectifierPhone || '',
+    deadline: form.deadline || '',
+    isOverdue: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    remark: form.remark || '',
+    _transitions: []
+  }
+  data.mockIssues.push(newIssue)
+  // 自动生成派单通知
+  const hName = getHouseholdName(form.householdId)
+  addNotification('assign', '新整改任务', `${hName} - ${form.description} 已上报，待整改`, newIssue.id)
+  return ok({ id: newIssue.id, status: 'pending', statusName: '待整改' })
 }
 
 export async function mockBatchReportIssues(form) {
   await delay(400)
-  return ok({
-    importedCount: form.householdIds.length,
-    failedCount: 0,
-    errors: []
-  })
+  const cur = getCurrentUser()
+  const count = form.householdIds.length
+  for (const hId of form.householdIds) {
+    const newId = 'iss_batch_' + Date.now() + '_' + hId
+    data.mockIssues.push({
+      id: newId,
+      householdId: hId,
+      householdName: getHouseholdName(hId),
+      type: form.type,
+      typeName: form.type === 'visual' ? '观感' : form.type === 'measure' ? '实测' : '公区',
+      category: form.category || '',
+      description: form.description,
+      status: 'pending', statusName: '待整改',
+      photos: form.photos || [],
+      reporter: cur.nickname, reporterId: cur.id,
+      rectifierPhone: form.rectifierPhone || '',
+      rectifier: form.rectifierName || '', rectifierId: '',
+      deadline: '',
+      isOverdue: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      remark: '',
+      _transitions: []
+    })
+    // 自动生成派单通知
+    const hName = getHouseholdName(hId)
+    addNotification('assign', '新整改任务', `${hName} - ${form.description} 已上报，待整改`, newId)
+  }
+  return ok({ importedCount: count, failedCount: 0, errors: [] })
 }
 
 export async function mockAcceptHousehold(householdId, type) {
@@ -118,7 +200,12 @@ export async function mockGetIssueDetail(issueId) {
 // ========== 整改流程 ==========
 export async function mockGetRectifyTasks(status) {
   await delay(200)
-  let list = data.mockIssues.filter(i => i.rectifierId === 'u_002')
+  const cur = getCurrentUser()
+  // 管理员看全部，其他角色只看指派给自己的任务
+  // 整改人按姓名匹配（上报时指定的姓名）
+  let list = cur.role === 'admin'
+    ? [...data.mockIssues]
+    : data.mockIssues.filter(i => i.rectifier === cur.nickname || i.reporterId === cur.id)
   if (status) {
     const statuses = status.split(',')
     list = list.filter(i => statuses.includes(i.status))
@@ -126,17 +213,36 @@ export async function mockGetRectifyTasks(status) {
   return ok({ list, total: list.length, page: 1, pageSize: 20 })
 }
 
+function pushTransition(issue, action, actionName, operatorName, operatorRole, detail) {
+  issue._transitions = issue._transitions || []
+  issue._transitions.push({ action, actionName, operatorName, operatorRole, detail: detail || {}, createdAt: new Date().toISOString() })
+}
+
 export async function mockStartRectify(issueId) {
   await delay(200)
+  const cur = getCurrentUser()
   const issue = data.mockIssues.find(i => i.id === issueId)
-  if (issue) issue.status = 'rectifying', issue.statusName = '整改中'
+  if (issue) {
+    pushTransition(issue, 'rectify_started', '开始整改', cur.nickname, '整改员')
+    issue.status = 'rectifying'
+    issue.statusName = '整改中'
+    issue.rectifier = cur.nickname
+    issue.rectifierId = cur.id
+    issue.updatedAt = new Date().toISOString()
+  }
   return ok({ status: 'rectifying', statusName: '整改中' })
 }
 
 export async function mockSubmitRectify(issueId, form) {
   await delay(300)
+  const cur = getCurrentUser()
   const issue = data.mockIssues.find(i => i.id === issueId)
-  if (issue) issue.status = 'pending_review', issue.statusName = '待复查'
+  if (issue) {
+    pushTransition(issue, 'rectify_submitted', '提交整改结果', cur.nickname, '整改员')
+    issue.status = 'pending_review'
+    issue.statusName = '待复查'
+    issue.updatedAt = new Date().toISOString()
+  }
   return ok({ status: 'pending_review', statusName: '待复查' })
 }
 
@@ -146,27 +252,51 @@ export async function mockGetPendingReviews() {
   return ok({ list, total: list.length, page: 1, pageSize: 20 })
 }
 
-export async function mockReviewIssue(issueId, result, opinion) {
+export async function mockReviewIssue(issueId, result, opinion, signature) {
   await delay(250)
+  const cur = getCurrentUser()
   const issue = data.mockIssues.find(i => i.id === issueId)
   if (result === 'pass') {
-    if (issue) issue.status = 'closed', issue.statusName = '已闭环'
+    if (issue) {
+      pushTransition(issue, 'review_passed', '复查通过', cur.nickname, cur.roleName || '监理', { result: '合格', opinion, hasSignature: !!signature })
+      issue.status = 'closed'
+      issue.statusName = '已闭环'
+      issue.signature = signature || ''
+      issue.updatedAt = new Date().toISOString()
+    }
     return ok({ status: 'closed', statusName: '已闭环' })
   } else {
-    if (issue) issue.status = 'rectifying', issue.statusName = '整改中'
+    if (issue) {
+      pushTransition(issue, 'review_rejected', '退回整改', cur.nickname, cur.roleName || '监理', { result: '不合格', opinion })
+      issue.status = 'rectifying'
+      issue.statusName = '整改中'
+      issue.updatedAt = new Date().toISOString()
+    }
     return ok({ status: 'rectifying', statusName: '整改中' })
   }
 }
 
 export async function mockGetIssueTimeline(issueId) {
   await delay(150)
-  return ok({
-    list: [
-      { action: 'reported', actionName: '上报问题', operatorName: '张查验', operatorRole: '查验员', createdAt: new Date(Date.now() - 86400000).toISOString(), detail: {} },
-      { action: 'assigned', actionName: '派单', operatorName: '系统', operatorRole: '', createdAt: new Date(Date.now() - 82800000).toISOString(), detail: { assignee: '李整改' } },
-      { action: 'rectify_started', actionName: '开始整改', operatorName: '李整改', operatorRole: '整改员', createdAt: new Date(Date.now() - 43200000).toISOString(), detail: {} }
-    ]
-  })
+  const issue = data.mockIssues.find(i => i.id === issueId)
+  if (!issue) return ok({ list: [] })
+
+  // 合并初始事件 + _transitions 记录
+  const list = []
+  // 上报事件
+  list.push({ action: 'reported', actionName: '上报问题', operatorName: issue.reporter || '查验员', operatorRole: '查验员', createdAt: issue.createdAt, detail: {} })
+  list.push({ action: 'assigned', actionName: '派单', operatorName: '系统', operatorRole: '', createdAt: issue.createdAt, detail: { assignee: issue.rectifier || '待指派' } })
+
+  // 后续流转事件
+  if (issue._transitions) {
+    for (const t of issue._transitions) {
+      list.push({ ...t })
+    }
+  }
+
+  // 按时间正序排列
+  list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+  return ok({ list: list.reverse() })
 }
 
 // ========== 通知 ==========
@@ -182,8 +312,71 @@ export async function mockMarkNotificationRead(id) {
   return ok({})
 }
 
+// ========== 问题库（全量问题，按楼栋筛选） ==========
+export async function mockGetAllIssues(buildingId) {
+  await delay(200)
+  let list = [...data.mockIssues]
+  if (buildingId) {
+    const hIds = data.mockHouseholds.filter(h => h.buildingId === buildingId).map(h => h.id)
+    list = list.filter(i => hIds.includes(i.householdId))
+  }
+  // 补全楼栋名
+  list = list.map(i => {
+    const h = data.mockHouseholds.find(x => x.id === i.householdId)
+    return { ...i, householdName: h ? h.name : i.householdName, buildingName: h ? h.buildingName : '' }
+  })
+  return ok({ list, total: list.length })
+}
+
+// ========== 超期提醒 ==========
+export async function mockCheckOverdue() {
+  await delay(100)
+  const now = Date.now()
+  const overdue = []
+  for (const issue of data.mockIssues) {
+    // 超整改期限
+    if (issue.deadline && (issue.status === 'pending' || issue.status === 'rectifying')) {
+      if (now > new Date(issue.deadline).getTime()) {
+        overdue.push({ id: issue.id, description: issue.description, householdName: issue.householdName, type: 'deadline', msg: '已超整改期限' })
+      }
+    }
+    // 待复查超过24小时未处理
+    if (issue.status === 'pending_review' && issue.updatedAt) {
+      if (now - new Date(issue.updatedAt).getTime() > 24 * 60 * 60 * 1000) {
+        overdue.push({ id: issue.id, description: issue.description, householdName: issue.householdName, type: 'review_delay', msg: '待复查超24小时未处理' })
+      }
+    }
+  }
+  return ok({ list: overdue })
+}
+
+// ========== 推算值 ==========
+export async function mockGetEstimatedValues() {
+  await delay(100)
+  return ok(data.mockEstimatedValues || {})
+}
+
 // ========== 统计 ==========
 export async function mockGetStatistics() {
   await delay(250)
-  return ok(data.mockStatistics)
+  const totalHouseholds = data.mockHouseholds.length
+  const allIssues = data.mockIssues || []
+  const totalIssues = allIssues.length
+  const pendingCount = allIssues.filter(i => i.status === 'pending').length
+  const rectifyingCount = allIssues.filter(i => i.status === 'rectifying').length
+  const pendingReviewCount = allIssues.filter(i => i.status === 'pending_review').length
+  const closedCount = allIssues.filter(i => i.status === 'closed').length
+  const checkedHouseholdIds = new Set(allIssues.map(i => i.householdId))
+  const checkedHouseholds = checkedHouseholdIds.size
+  const rectifyRate = totalIssues > 0 ? (closedCount / totalIssues) : 0
+  return ok({
+    totalHouseholds,
+    checkedHouseholds,
+    totalIssues,
+    pendingCount,
+    rectifyingCount,
+    pendingReviewCount,
+    closedCount,
+    rectifyRate
+  })
 }

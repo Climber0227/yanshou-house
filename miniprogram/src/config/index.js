@@ -12,7 +12,15 @@ const ENV = {
   }
 }
 
-const currentEnv = process.env.NODE_ENV === 'production' ? 'production' : 'development'
-const config = ENV[currentEnv]
+// 强制使用 Mock 数据（开发阶段）
+// 等后端接口就绪后，将 useMock 改为 false 并填写真实 baseUrl
+const config = {
+  useMock: true,
+  baseUrl: 'https://dev-api.example.com',
+  uploadUrl: 'https://dev-api.example.com/upload'
+}
+
+// 页面打开时输出的调试信息（微信开发者工具 console 可见）
+console.log('[config] useMock =', config.useMock)
 
 export default config

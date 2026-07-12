@@ -1,103 +1,183 @@
-// 全局 uni.scss
 @import '@/styles/tokens.scss';
 
-view,
-text,
-input,
-textarea,
-button {
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+// === 微动画关键帧 ===
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// === 全局过渡 ===
 page {
-  background-color: $uni-bg-color;
-  color: $uni-text-color;
-  font-size: $font-md;
-  line-height: 1.6;
+  background: linear-gradient(180deg, #F0F4FF 0%, #F8F9FE 120px, #F8F9FE 100%);
+  color: $text-primary;
+  font-size: $fs-md;
+  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  min-height: 100vh;
 }
 
-// 通用卡片样式
-.card {
-  background: #ffffff;
+// 所有卡片添加微动效
+.card, .card-accent, .m-card, .check-card, [class*="card-"] {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+// 按钮点击反馈
+.btn-primary, .btn-outline, [class*="btn-"], [class*="action-card"] {
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.btn-primary:active, .btn-outline:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+// 列表项逐条淡入
+.card, .i-row, .issue-row, .tl-item, .recent-item, .select-row {
+  animation: fadeInUp 0.35s ease both;
+}
+// 每项延迟递增，产生级联效果
+.card:nth-child(1), .i-row:nth-child(1), .issue-row:nth-child(1) { animation-delay: 0.02s; }
+.card:nth-child(2), .i-row:nth-child(2), .issue-row:nth-child(2) { animation-delay: 0.06s; }
+.card:nth-child(3), .i-row:nth-child(3), .issue-row:nth-child(3) { animation-delay: 0.10s; }
+.card:nth-child(4), .i-row:nth-child(4), .issue-row:nth-child(4) { animation-delay: 0.14s; }
+.card:nth-child(5), .i-row:nth-child(5), .issue-row:nth-child(5) { animation-delay: 0.18s; }
+.card:nth-child(6), .i-row:nth-child(6), .issue-row:nth-child(6) { animation-delay: 0.22s; }
+.card:nth-child(n+7), .i-row:nth-child(n+7), .issue-row:nth-child(n+7) { animation-delay: 0.26s; }
+
+// 通知徽章呼吸动画
+.badge {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+// 统计数字上浮
+.stat-num {
+  animation: countUp 0.5s ease both;
+}
+
+// 标签切换动画
+.seg-item, .seg-item-lg {
+  transition: all 0.25s ease;
+}
+
+// 底部操作栏
+.submit-bar, .bb {
+  animation: fadeInUp 0.3s ease;
+}
+
+// 微信小程序原生 input/textarea 不兼容 Web box-sizing。
+// 垂直 padding 会向内压缩文字区域导致截断——全局禁止 vertical padding。
+// 各组件只设 padding-left/right，用 height 控制整体高度。
+input {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 44px;
+  line-height: 44px;
+}
+
+textarea {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: 60px;
+}
+
+// 信息卡片（带左色条）
+.card-accent {
+  background: $bg-card;
   border-radius: $radius-md;
-  border: 1px solid $uni-border-color;
-  padding: $spacing-md;
-  margin-bottom: $spacing-sm;
+  border: 1px solid $border;
+  position: relative;
+  padding: $sp-lg;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 2px;
+    background: $primary;
+  }
+}
+
+// 普通卡片
+.card {
+  background: $bg-card;
+  border-radius: $radius-md;
+  border: 1px solid $border;
+  padding: $sp-lg;
+}
+
+// 浅色操作区
+.action-area {
+  background: $primary-light;
+  border-radius: $radius-md;
+  padding: $sp-md;
 }
 
 // 状态标签
 .tag {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: $font-xs;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: $fs-xs;
   font-weight: 600;
-  line-height: 1.5;
-
-  &.tag-pending {
-    background: $status-pending-bg;
-    color: $status-pending;
-  }
-  &.tag-progress {
-    background: $status-progress-bg;
-    color: $status-progress;
-  }
-  &.tag-review {
-    background: $status-review-bg;
-    color: $status-review;
-  }
-  &.tag-closed {
-    background: $status-closed-bg;
-    color: $status-closed;
-  }
-  &.tag-rejected {
-    background: $status-rejected-bg;
-    color: $status-rejected;
-  }
+  line-height: 1.6;
 }
 
-// 按钮
+.tag-pending { background: #FFF3E0; color: #E65100; }
+.tag-progress { background: $primary-light; color: $primary; }
+.tag-review { background: #F3E8FF; color: #7C3AED; }
+.tag-closed { background: #E8F5E9; color: #2E7D32; }
+.tag-rejected { background: #FFEBEE; color: #ED3241; }
+
+// 主按钮
 .btn-primary {
-  background: $uni-color-primary;
-  color: #ffffff;
+  background: $primary;
+  color: #fff;
   border: none;
   border-radius: $radius-md;
-  padding: 10px 16px;
-  font-size: $font-md;
+  padding: 12px 20px;
+  font-size: $fs-md;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  text-align: center;
 }
 
 .btn-outline {
   background: transparent;
-  color: $uni-color-primary;
-  border: 1px solid $uni-color-primary;
+  color: $primary;
+  border: 1.5px solid $primary;
   border-radius: $radius-md;
-  padding: 10px 16px;
-  font-size: $font-md;
+  padding: 10px 20px;
+  font-size: $fs-sm;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  text-align: center;
 }
 
-// 页面标题
-.page-title {
-  font-size: $font-lg;
-  font-weight: 600;
-  padding: $spacing-md $spacing-lg;
-  color: $uni-text-color;
-}
-
-// 分隔线
+// 分割线
 .divider {
   height: 1px;
-  background: $uni-border-color;
-  margin: $spacing-sm 0;
+  background: $border;
+  margin: $sp-md 0;
 }
 
 // 空状态
@@ -107,6 +187,11 @@ page {
   align-items: center;
   justify-content: center;
   padding: 60px 20px;
-  color: $uni-text-color-grey;
-  font-size: $font-sm;
+  color: $text-hint;
+  font-size: $fs-sm;
+}
+
+// 页面内边距
+.page {
+  padding: 0 $sp-lg 20px;
 }

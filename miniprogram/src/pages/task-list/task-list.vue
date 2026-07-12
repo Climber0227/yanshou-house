@@ -1,25 +1,44 @@
 <template>
-  <view class="page">
-    <view class="tab-bar">
-      <view v-for="t in tabs" :key="t.key"
-        class="tab" :class="{ active: activeTab === t.key }"
-        @click="activeTab = t.key; loadTasks()">
-        <text>{{ t.label }}</text>
+<view class="page">
+  <!-- 分段 -->
+  <view class="seg">
+    <view v-for="t in tabs" :key="t.key"
+      class="seg-item" :class="{ active: active === t.key }"
+      @click="active = t.key; load()">
+      <text>{{ t.label }}</text>
+    </view>
+  </view>
+
+  <view v-if="loading" class="empty"><text>加载中...</text></view>
+  <template v-else>
+    <view v-for="i in list" :key="i.id" class="card" @click="goDetail(i)">
+      <view class="card-top">
+        <view class="card-info">
+          <text class="card-title">{{ i.description }}</text>
+          <text class="card-meta">{{ i.householdName }}</text>
+        </view>
+        <text class="tag" :class="tagMap[i.status]">{{ i.statusName }}</text>
+      </view>
+      <view class="card-foot">
+        <text class="card-foot-text">{{ i.reporter }} 上报</text>
+        <text v-if="i.deadline" class="card-foot-text" :class="{ over: i.isOverdue }">
+          {{ i.isOverdue ? '已超期 ' : '截止 ' }}{{ fmt(i.deadline) }}
+        </text>
       </view>
     </view>
-
-    <view v-if="loading" class="loading-state"><text>加载中...</text></view>
-    <template v-else>
-      <IssueCard v-for="issue in tasks" :key="issue.id" :issue="issue" :showDeadline="true" @tap="goDetail" />
-      <view v-if="tasks.length === 0" class="empty-section"><text>暂无任务</text></view>
-    </template>
-  </view>
+    <view v-if="list.length === 0" class="empty"><text>暂无任务</text></view>
+  </template>
+</view>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useUserStore } from '@/store/user'
 import { getRectifyTasks, getPendingReviews } from '@/api'
-import IssueCard from '@/components/IssueCard.vue'
+
+const store = useUserStore()
+const role = computed(() => store.user?.role || '')
 
 const tabs = [
   { key: 'pending', label: '待整改' },
@@ -27,34 +46,58 @@ const tabs = [
   { key: 'pending_review', label: '待复查' },
   { key: 'closed', label: '已闭环' }
 ]
-const activeTab = ref('pending')
-const tasks = ref([])
+const active = ref('pending')
+const list = ref([])
 const loading = ref(false)
 
-async function loadTasks() {
+const tagMap = { pending:'tag-pending', rectifying:'tag-progress', pending_review:'tag-review', closed:'tag-closed' }
+
+// 按角色调整默认选中
+const roleDefaults = { inspector: 'pending_review', supervisor: 'pending_review', rectifier: 'pending', admin: 'pending' }
+
+async function load() {
   loading.value = true
-  if (activeTab.value === 'pending_review') {
-    const res = await getPendingReviews()
-    if (res.code === 0) tasks.value = res.data.list || []
+  if (active.value === 'pending_review') {
+    const r = await getPendingReviews()
+    list.value = r.code === 0 ? (r.data.list || []) : []
   } else {
-    const res = await getRectifyTasks(activeTab.value)
-    if (res.code === 0) tasks.value = res.data.list || []
+    const r = await getRectifyTasks(active.value)
+    list.value = r.code === 0 ? (r.data.list || []) : []
   }
   loading.value = false
 }
 
-function goDetail(issue) {
-  uni.navigateTo({ url: '/pages/issue-detail/issue-detail?id=' + issue.id })
-}
+function goDetail(i) { uni.navigateTo({ url: '/pages/issue-detail/issue-detail?id=' + i.id }) }
+function fmt(d) { return d ? new Date(d).toLocaleDateString('zh-CN', {month:'numeric',day:'numeric'}) : '' }
 
-onMounted(() => { loadTasks() })
+onMounted(() => {
+  if (roleDefaults[role.value]) active.value = roleDefaults[role.value]
+  load()
+})
+onShow(() => {
+  load()
+})
 </script>
 
 <style scoped>
 .page { padding: 0 16px 20px; }
-.tab-bar { display: flex; gap: 4px; background: #F1F5F9; border-radius: 8px; padding: 3px; margin: 12px 0; }
-.tab { flex: 1; text-align: center; padding: 6px 0; border-radius: 6px; font-size: 12px; color: #64748b; }
-.tab.active { background: #fff; color: #1A56DB; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
-.loading-state { padding: 60px 20px; text-align: center; color: #64748b; }
-.empty-section { padding: 60px 20px; text-align: center; color: #94a3b8; font-size: 13px; }
+.seg { display: flex; gap: 4px; background: #F0F1F5; border-radius: 10px; padding: 3px; margin: 12px 0; }
+.seg-item { flex: 1; text-align: center; padding: 7px 0; border-radius: 8px; font-size: 12px; color: #71727A; }
+.seg-item.active { background: #fff; color: #006FFD; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+
+.card { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 14px; margin-bottom: 8px; }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-info { flex: 1; min-width: 0; }
+.card-title { font-size: 14px; font-weight: 600; color: #1F2024; display: block; }
+.card-meta { font-size: 11px; color: #8F9098; margin-top: 3px; display: block; }
+.card-foot { display: flex; gap: 16px; margin-top: 8px; }
+.card-foot-text { font-size: 10px; color: #8F9098; }
+.card-foot-text.over { color: #ED3241; font-weight: 500; }
+
+.tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.tag-pending { background: #FFF3E0; color: #E65100; }
+.tag-progress { background: #EAF2FF; color: #006FFD; }
+.tag-review { background: #F3E8FF; color: #7C3AED; }
+.tag-closed { background: #E8F5E9; color: #2E7D32; }
+.empty { padding: 60px 0; text-align: center; color: #8F9098; font-size: 13px; }
 </style>

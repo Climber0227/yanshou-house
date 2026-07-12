@@ -3,365 +3,362 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>分户验收小程序 - UI 方案</title>
+<title>分户验收 — 设计参考</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f3f4f6; padding: 48px 24px; color: #111; }
-  h1 { text-align: center; font-size: 24px; font-weight: 600; margin-bottom: 4px; }
-  .sub { text-align: center; color: #6b7280; font-size: 13px; margin-bottom: 40px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #EEEFF2; font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; padding: 48px 24px; display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; }
 
-  .grid { max-width: 1320px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+.phone { width: 375px; height: 812px; background: #F8F9FE; border-radius: 36px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.12); display: flex; flex-direction: column; flex-shrink: 0; }
 
-  .scheme { flex: 0 0 310px; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; }
+/* Status bar */
+.sb { height: 44px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 12px; font-weight: 600; color: #1F2024; }
+.sb .time { margin-left: 8px; }
+.sb .icons { display: flex; gap: 5px; align-items: center; }
+.sb .icons span { font-size: 10px; }
 
-  /* Header */
-  .sh { padding: 20px 20px 12px; }
-  .sh h2 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
-  .sh p { font-size: 12px; color: #6b7280; line-height: 1.5; }
-  .sh .hint { font-size: 11px; color: #9ca3af; margin-top: 6px; }
+/* Nav header */
+.nh { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 0 16px; position: relative; border-bottom: 1px solid #F0F1F5; }
+.nh .title { font-size: 15px; font-weight: 600; color: #1F2024; }
+.nh .back { position: absolute; left: 16px; width: 24px; height: 24px; display: flex; align-items: center; }
+.nh .action { position: absolute; right: 16px; font-size: 12px; color: #006FFD; }
 
-  /* Swatches */
-  .sw { padding: 0 20px 14px; display: flex; gap: 6px; flex-wrap: wrap; }
-  .swatch { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; }
-  .swatch-lg { width: 52px; height: 32px; border-radius: 6px; }
+/* Content */
+.content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-  /* UI elements */
-  .demo { padding: 0 14px 16px; display: flex; flex-direction: column; gap: 8px; }
-  .demo-hd { font-size: 11px; font-weight: 600; letter-spacing: .5px; padding-bottom: 4px; border-bottom: 1px solid #f3f4f6; }
+/* Cards */
+.card { background: #fff; border-radius: 12px; border: 1px solid #E8E9F1; padding: 14px; }
+.card-accent { background: #fff; border-radius: 12px; border: 1px solid #E8E9F1; padding: 14px; position: relative; }
+.card-accent::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 2px; background: #006FFD; }
 
-  /* Button row */
-  .btn-row { display: flex; gap: 6px; }
-  .btn { flex: 1; padding: 8px 0; border-radius: 6px; font-size: 12px; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px; }
-  .btn svg { display: block; }
+/* Stats */
+.stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; }
+.stat-cell { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px 4px; text-align: center; }
+.stat-num { font-size: 20px; font-weight: 700; color: #1F2024; line-height: 1.2; }
+.stat-num.warn { color: #FF9500; }
+.stat-num.blue { color: #006FFD; }
+.stat-num.green { color: #00A86B; }
+.stat-lbl { font-size: 10px; color: #8F9098; margin-top: 2px; }
 
-  /* Card sample */
-  .card-sm { border-radius: 6px; padding: 10px; }
-  .card-row { display: flex; justify-content: space-between; align-items: center; }
-  .card-tl { font-size: 12px; font-weight: 600; }
-  .card-meta { font-size: 10px; margin-top: 2px; opacity: .55; display: flex; gap: 6px; }
+/* Quick actions */
+.quick-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.quick-item { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+.q-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.q-icon svg { width: 18px; height: 18px; }
+.q-icon.blue { background: #EAF2FF; color: #006FFD; }
+.q-icon.green { background: #E8F5E9; color: #00A86B; }
+.q-icon.orange { background: #FFF3E0; color: #FF9500; }
+.q-icon.purple { background: #F3E8FF; color: #7C3AED; }
+.q-lbl { font-size: 11px; color: #71727A; }
 
-  /* Tags */
-  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+/* Section header */
+.sec { display: flex; justify-content: space-between; align-items: center; }
+.sec-title { font-size: 14px; font-weight: 600; color: #1F2024; }
+.sec-more { font-size: 12px; color: #006FFD; }
 
-  /* Stat grid */
-  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
-  .stat-cell { border-radius: 6px; padding: 8px 4px; text-align: center; }
-  .stat-n { font-size: 18px; font-weight: 700; line-height: 1.2; }
-  .stat-l { font-size: 9px; margin-top: 1px; opacity: .55; }
+/* List item */
+.list-item { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+.list-item .icon-circle { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.list-item .icon-circle.ic-blue { background: #EAF2FF; color: #006FFD; }
+.list-item .icon-circle.ic-green { background: #E8F5E9; color: #00A86B; }
+.list-item .icon-circle.ic-orange { background: #FFF3E0; color: #FF9500; }
+.list-item .info { flex: 1; }
+.list-item .info .name { font-size: 14px; font-weight: 500; color: #1F2024; display: block; }
+.list-item .info .desc { font-size: 11px; color: #8F9098; margin-top: 2px; display: block; }
+.list-item .arrow { color: #C5C6CC; font-size: 16px; }
 
-  /* Tabs */
-  .tb { display: flex; border-top: 1px solid; }
-  .tb-item { flex: 1; text-align: center; font-size: 9px; padding: 6px 0 4px; }
-  .tb-item svg { display: block; margin: 0 auto 2px; }
+/* Issue list */
+.issue-row { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+.issue-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.issue-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-warn { background: #FF9500; }
+.dot-blue { background: #006FFD; }
+.dot-purple { background: #7C3AED; }
+.dot-green { background: #00A86B; }
+.issue-title { font-size: 13px; font-weight: 600; color: #1F2024; display: block; }
+.issue-meta { font-size: 10px; color: #8F9098; margin-top: 2px; display: block; }
 
-  /* Divider */
-  .dv { height: 1px; background: #f3f4f6; margin: 4px 0; }
+/* Tags */
+.tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+.tag-pending { background: #FFF3E0; color: #E65100; }
+.tag-progress { background: #EAF2FF; color: #006FFD; }
+.tag-review { background: #F3E8FF; color: #7C3AED; }
+.tag-closed { background: #E8F5E9; color: #2E7D32; }
 
-  /* ========== SCHEME 1: 工地灰橙 ========== */
-  .s1 { --p: #B45F06; --p-light: #FEF3E2; --p-dark: #783F04; --b: #F5F3EF; --c: #fff; --text: #1C1917; --meta: #78716C; --border: #E7E2D8; --succ: #3B7A5E; --warn: #B45F06; --info: #1E4A6B; --err: #B91C1C; --tab-border: #E7E2D8; }
-  .s1 .demo-hd { color: var(--p); }
-  .s1 .btn.p { background: var(--p); color: #fff; }
-  .s1 .btn.o { border: 1px solid var(--p); color: var(--p); }
-  .s1 .card-sm { background: var(--c); border: 1px solid var(--border); }
-  .s1 .card-sm.hl { background: var(--p); color: #fff; border: none; }
-  .s1 .stat-cell { background: var(--c); border: 1px solid var(--border); }
-  .s1 .tag.g { background: #E6F0EB; color: var(--succ); }
-  .s1 .tag.y { background: var(--p-light); color: var(--warn); }
-  .s1 .tag.b { background: #E6EEF4; color: var(--info); }
-  .s1 .tb { border-color: var(--tab-border); background: #fff; }
-  .s1 .tb-item.active { color: var(--p); }
-  .s1 .tb-item { color: #a8a29e; }
+/* Segment */
+.seg { display: flex; gap: 4px; background: #F0F1F5; border-radius: 10px; padding: 3px; }
+.seg-item { flex: 1; text-align: center; padding: 7px 0; border-radius: 8px; font-size: 12px; color: #71727A; }
+.seg-item.active { background: #fff; color: #006FFD; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
 
-  /* ========== SCHEME 2: 图纸蓝白 ========== */
-  .s2 { --p: #1A56DB; --p-light: #E8EFFB; --p-dark: #1E3A5F; --b: #F8F9FC; --c: #fff; --text: #1e293b; --meta: #64748b; --border: #E2E8F0; --succ: #0D9488; --warn: #B45309; --info: #1A56DB; --err: #DC2626; --tab-border: #E2E8F0; }
-  .s2 .demo-hd { color: var(--p-dark); }
-  .s2 .btn.p { background: var(--p); color: #fff; }
-  .s2 .btn.o { border: 1px solid var(--p); color: var(--p); }
-  .s2 .card-sm { background: var(--c); border: 1px solid var(--border); }
-  .s2 .card-sm.hl { background: var(--p-dark); color: #fff; border: none; }
-  .s2 .stat-cell { background: var(--c); border: 1px solid var(--border); }
-  .s2 .tag.g { background: #F0FDFA; color: var(--succ); }
-  .s2 .tag.y { background: #FFFBEB; color: var(--warn); }
-  .s2 .tag.b { background: var(--p-light); color: var(--info); }
-  .s2 .tb { border-color: var(--tab-border); background: #fff; }
-  .s2 .tb-item.active { color: var(--p); }
-  .s2 .tb-item { color: #94a3b8; }
+/* Chips */
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 8px 16px; border: 1px solid #E8E9F1; border-radius: 8px; font-size: 13px; color: #71727A; }
+.chip.active { border-color: #006FFD; background: #EAF2FF; color: #006FFD; font-weight: 600; }
 
-  /* ========== SCHEME 3: 青绿自然 ========== */
-  .s3 { --p: #3B7A5E; --p-light: #EAF3EE; --p-dark: #24523D; --b: #F6F7F5; --c: #fff; --text: #1C1917; --meta: #78716C; --border: #E2E3DE; --succ: #3B7A5E; --warn: #9A5B23; --info: #2B6B8A; --err: #B91C1C; --tab-border: #E2E3DE; }
-  .s3 .demo-hd { color: var(--p); }
-  .s3 .btn.p { background: var(--p); color: #fff; }
-  .s3 .btn.o { border: 1px solid var(--p); color: var(--p); }
-  .s3 .card-sm { background: var(--c); border: 1px solid var(--border); }
-  .s3 .card-sm.hl { background: var(--p-dark); color: #fff; border: none; }
-  .s3 .stat-cell { background: var(--c); border: 1px solid var(--border); }
-  .s3 .tag.g { background: var(--p-light); color: var(--p); }
-  .s3 .tag.y { background: #FDF1E6; color: var(--warn); }
-  .s3 .tag.b { background: #E8F0F5; color: var(--info); }
-  .s3 .tb { border-color: var(--tab-border); background: #fff; }
-  .s3 .tb-item.active { color: var(--p); }
-  .s3 .tb-item { color: #a8a29e; }
+/* Building chip horizontal scroll */
+.b-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.b-chip { border: 1px solid #E8E9F1; border-radius: 12px; padding: 12px 20px; background: #fff; text-align: center; white-space: nowrap; flex-shrink: 0; }
+.b-chip .b-name { font-size: 15px; font-weight: 600; color: #1F2024; display: block; }
+.b-chip .b-count { font-size: 10px; color: #8F9098; }
+.b-chip.active { border-color: #006FFD; background: #EAF2FF; }
+.b-chip.active .b-name { color: #006FFD; }
 
-  /* ========== SCHEME 4: 藏蓝金 ========== */
-  .s4 { --p: #1E293B; --p-light: #F0F2F5; --p-dark: #0F172A; --b: #F8F9FA; --c: #fff; --text: #1e293b; --meta: #64748b; --border: #E2E8F0; --succ: #3B7A5E; --warn: #9A5B23; --info: #1A56DB; --err: #B91C1C; --tab-border: #E2E8F0; }
-  .s4 .demo-hd { color: var(--p); }
-  .s4 .btn.p { background: var(--p); color: #fff; }
-  .s4 .btn.o { border: 1px solid var(--p); color: var(--p); }
-  .s4 .card-sm { background: var(--c); border: 1px solid var(--border); }
-  .s4 .card-sm.hl { background: #8B7340; color: #fff; border: none; }
-  .s4 .stat-cell { background: var(--c); border: 1px solid var(--border); }
-  .s4 .tag.g { background: #F0FDFA; color: var(--succ); }
-  .s4 .tag.y { background: #FFFBEB; color: var(--warn); }
-  .s4 .tag.b { background: #EFF6FF; color: var(--info); }
-  .s4 .tb { border-color: var(--tab-border); background: #fff; }
-  .s4 .tb-item.active { color: var(--p); }
-  .s4 .tb-item { color: #94a3b8; }
+/* Tab bar */
+.tb { height: 83px; background: #fff; border-top: 1px solid #E8E9F1; display: flex; align-items: flex-start; justify-content: space-around; padding-top: 10px; }
+.tb-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: #8F9098; flex: 1; text-align: center; }
+.tb-item.active { color: #006FFD; }
+.tb-item svg { width: 20px; height: 20px; }
+.tb-center { position: relative; top: -16px; }
+.tb-center .scan-btn { width: 48px; height: 48px; border-radius: 50%; background: #006FFD; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,111,253,.3); }
 
-  .note { max-width: 1320px; margin: 24px auto 0; background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #e5e7eb; }
-  .note h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
-  .note table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  .note th { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 500; }
-  .note td { padding: 6px 8px; border-bottom: 1px solid #f3f4f6; }
+/* Hero */
+.hero { background: #EAF2FF; border-radius: 14px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.hero .hero-icon { width: 80px; height: 80px; border: 3px solid #006FFD; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+.hero .hero-title { font-size: 18px; font-weight: 700; color: #1F2024; }
+.hero .hero-hint { font-size: 12px; color: #71727A; line-height: 1.6; }
+
+/* Buttons */
+.btn { background: #006FFD; color: #fff; border: none; border-radius: 10px; padding: 12px 24px; font-size: 14px; font-weight: 600; text-align: center; width: 100%; }
+.btn-ghost { background: transparent; color: #006FFD; border: 1.5px solid #006FFD; border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 600; text-align: center; }
+
+/* Profile */
+.profile { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid #E8E9F1; border-radius: 14px; padding: 20px 16px; }
+.avatar { width: 48px; height: 48px; border-radius: 14px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; }
+
+/* HH info card */
+.hh-card { background: #fff; border-radius: 12px; border: 1px solid #E8E9F1; padding: 16px; }
+.hh-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.hh-name { font-size: 18px; font-weight: 700; color: #1F2024; display: block; }
+.hh-addr { font-size: 12px; color: #71727A; margin-top: 3px; display: block; }
+.hh-stats { display: flex; gap: 24px; margin-top: 14px; }
+.hh-s { text-align: left; }
+.hh-s .n { font-size: 20px; font-weight: 700; color: #1F2024; display: block; }
+.hh-s .n.w { color: #FF9500; }
+.hh-s .n.g { color: #00A86B; }
+.hh-s .l { font-size: 10px; color: #8F9098; }
+
+/* Action grid */
+.act-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.act-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.act-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+.act-icon.ai-blue { background: #EAF2FF; color: #006FFD; }
+.act-icon.ai-green { background: #E8F5E9; color: #00A86B; }
+.act-icon.ai-gray { background: #F0F1F5; color: #71727A; }
+.act-icon.ai-orange { background: #FFF3E0; color: #FF9500; }
+.act-lbl { font-size: 11px; color: #71727A; }
+
+/* Label */
+.label { font-size: 14px; font-weight: 600; color: #1F2024; margin-bottom: 4px; }
 </style>
 </head>
 <body>
 
-<h1>分户验收小程序 · UI 配色方案</h1>
-<p class="sub">基于 uni-app + uView Plus · 4 套配色，颜色从工地真实场景提取</p>
+<!-- ====== 屏幕 1: 工作台 (首页) ====== -->
+<div class="phone">
+  <div class="sb"><span class="time">9:41</span><span class="icons"><span>5G</span><span id="bat">77</span></span></div>
+  <div class="nh"><span class="title">工作台</span></div>
 
-<div class="grid">
+  <div class="content">
+    <!-- 用户 bar -->
+    <div class="profile" style="padding:12px 16px;">
+      <div class="avatar">张</div>
+      <div style="flex:1;"><span style="font-size:15px;font-weight:600;color:#1F2024;">张查验</span><br><span style="font-size:11px;color:#8F9098;">查验员</span></div>
+      <span style="font-size:18px;position:relative;"><span style="position:absolute;top:-4px;right:-6px;background:#ED3241;color:#fff;font-size:8px;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;">3</span>🔔</span>
+    </div>
 
-  <!-- 方案 1 -->
-  <div class="scheme s1">
-    <div class="sh">
-      <h2 style="color:var(--p)">工程灰橙</h2>
-      <p>暖灰底 · 琥珀橙主色 · 参考安全帽/警示色</p>
-      <div class="hint">户外强光可见 · 粗用不显脏</div>
+    <!-- 统计 -->
+    <div class="stat-row">
+      <div class="stat-cell"><div class="stat-num">345</div><div class="stat-lbl">总问题</div></div>
+      <div class="stat-cell"><div class="stat-num warn">18</div><div class="stat-lbl">待整改</div></div>
+      <div class="stat-cell"><div class="stat-num blue">25</div><div class="stat-lbl">整改中</div></div>
+      <div class="stat-cell"><div class="stat-num green">150</div><div class="stat-lbl">已闭环</div></div>
     </div>
-    <div class="sw">
-      <div class="swatch" style="background:#B45F06"></div>
-      <div class="swatch" style="background:#783F04"></div>
-      <div class="swatch" style="background:#3B7A5E"></div>
-      <div class="swatch" style="background:#1E4A6B"></div>
-      <div class="swatch-lg" style="background:#F5F3EF"></div>
+
+    <!-- 快捷入口 -->
+    <span class="sec-title">快捷操作</span>
+    <div class="quick-row">
+      <div class="quick-item"><div class="q-icon blue"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l7-7 7 7"/><path d="M5 7v8a1 1 0 001 1h8a1 1 0 001-1V7"/></svg></div><span class="q-lbl">选户操作</span></div>
+      <div class="quick-item"><div class="q-icon green"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h14v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M2 4a1 1 0 011-1h14a1 1 0 011 1v3H2V4z"/></svg></div><span class="q-lbl">一户一档</span></div>
+      <div class="quick-item"><div class="q-icon orange"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h8M6 10h8M6 16h8"/></svg></div><span class="q-lbl">我的任务</span></div>
+      <div class="quick-item"><div class="q-icon purple"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 5v14H3V5"/><path d="M3 1h14v4H3z"/><path d="M8 9h4M8 13h4"/></svg></div><span class="q-lbl">批量上报</span></div>
     </div>
-    <div class="demo">
-      <div class="demo-hd">操作区</div>
-      <div class="btn-row">
-        <div class="btn p"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码验房</div>
-        <div class="btn o"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的任务</div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">数据卡片</div>
-      <div class="card-sm hl" style="margin-bottom:2px;">
-        <div style="font-size:10px;opacity:.7;margin-bottom:4px;">当前户</div>
-        <div style="font-size:14px;font-weight:700;">2#楼 西单元 1层 西户</div>
-        <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;opacity:.75;">待办 3 · 闭环 12</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-cell"><div class="stat-n" style="color:var(--p)">8</div><div class="stat-l">待整改</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--warn)">5</div><div class="stat-l">整改中</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--info)">3</div><div class="stat-l">待复查</div></div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">状态标签</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <span class="tag y">待整改</span>
-        <span class="tag b">整改中</span>
-        <span class="tag g">已闭环</span>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">问题列表</div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">墙面空鼓 · 东墙</span><span class="tag y">待整改</span></div><div class="card-meta"><span>张查验员</span><span>超期 2天</span></div></div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">地面开裂 · 客厅</span><span class="tag b">整改中</span></div><div class="card-meta"><span>李整改员</span><span>今日截止</span></div></div>
-      <div class="dv"></div>
-      <div class="demo-hd">底部导航</div>
-      <div class="tb">
-        <div class="tb-item active"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2 10l8-8 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8a1 1 0 001 1h8a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5"/></svg>工作台</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>任务</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v14H3z" stroke="currentColor" stroke-width="1.5"/><path d="M7 12l2-3 2 2 2-4 2 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>统计</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的</div>
-      </div>
-    </div>
+
+    <!-- 待办 -->
+    <div class="sec"><span class="sec-title">待办问题</span><span class="sec-more">全部 ›</span></div>
+    <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+      <div class="issue-left"><div class="issue-dot dot-warn"></div><div><span class="issue-title">墙面空鼓 · 东墙</span><span class="issue-meta">2#楼西单元1层西户</span></div></div>
+      <span class="tag tag-pending">待整改</span>
+    </div></div>
+    <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+      <div class="issue-left"><div class="issue-dot dot-blue"></div><div><span class="issue-title">地面开裂 · 客厅</span><span class="issue-meta">3#楼东单元5层东户</span></div></div>
+      <span class="tag tag-progress">整改中</span>
+    </div></div>
+    <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+      <div class="issue-left"><div class="issue-dot dot-green"></div><div><span class="issue-title">门窗划痕 · 主卧窗</span><span class="issue-meta">2#楼西单元1层西户 · 已闭环</span></div></div>
+      <span class="tag tag-closed">已闭环</span>
+    </div></div>
   </div>
 
-  <!-- 方案 2 -->
-  <div class="scheme s2">
-    <div class="sh">
-      <h2 style="color:var(--p)">图纸蓝白</h2>
-      <p>冷白底 · 标准蓝主色 · 参考工程图纸/蓝图</p>
-      <div class="hint">清爽通用 · 信息密度高</div>
+  <!-- Tab bar -->
+  <div class="tb">
+    <div class="tb-item active">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l7-7 7 7"/><path d="M5 7v8a1 1 0 001 1h8a1 1 0 001-1V7"/></svg>
+      首页
     </div>
-    <div class="sw">
-      <div class="swatch" style="background:#1A56DB"></div>
-      <div class="swatch" style="background:#1E3A5F"></div>
-      <div class="swatch" style="background:#0D9488"></div>
-      <div class="swatch" style="background:#B45309"></div>
-      <div class="swatch-lg" style="background:#F8F9FC"></div>
+    <div class="tb-item">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h14v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M2 4a1 1 0 011-1h14a1 1 0 011 1v3H2V4z"/></svg>
+      档案
     </div>
-    <div class="demo">
-      <div class="demo-hd">操作区</div>
-      <div class="btn-row">
-        <div class="btn p"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码验房</div>
-        <div class="btn o"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的任务</div>
+    <div class="tb-item tb-center active">
+      <div class="scan-btn">
+        <svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="10" cy="10" r="2.5"/><path d="M7 3v1.5M13 3v1.5"/></svg>
       </div>
-      <div class="dv"></div>
-      <div class="demo-hd">数据卡片</div>
-      <div class="card-sm hl" style="margin-bottom:2px;">
-        <div style="font-size:10px;opacity:.7;margin-bottom:4px;">当前户</div>
-        <div style="font-size:14px;font-weight:700;">2#楼 西单元 1层 西户</div>
-        <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;opacity:.75;">待办 3 · 闭环 12</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-cell"><div class="stat-n" style="color:var(--p)">8</div><div class="stat-l">待整改</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--warn)">5</div><div class="stat-l">整改中</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--info)">3</div><div class="stat-l">待复查</div></div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">状态标签</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <span class="tag y">待整改</span>
-        <span class="tag b">整改中</span>
-        <span class="tag g">已闭环</span>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">问题列表</div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">墙面空鼓 · 东墙</span><span class="tag y">待整改</span></div><div class="card-meta"><span>张查验员</span><span>超期 2天</span></div></div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">地面开裂 · 客厅</span><span class="tag b">整改中</span></div><div class="card-meta"><span>李整改员</span><span>今日截止</span></div></div>
-      <div class="dv"></div>
-      <div class="demo-hd">底部导航</div>
-      <div class="tb">
-        <div class="tb-item active"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2 10l8-8 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8a1 1 0 001 1h8a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5"/></svg>工作台</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>任务</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v14H3z" stroke="currentColor" stroke-width="1.5"/><path d="M7 12l2-3 2 2 2-4 2 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>统计</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的</div>
-      </div>
+      <span style="font-size:10px;color:#006FFD;margin-top:-4px;">扫码</span>
+    </div>
+    <div class="tb-item">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h8M6 10h8M6 16h8"/></svg>
+      任务
+    </div>
+    <div class="tb-item">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7.5" r="2"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4"/></svg>
+      我的
     </div>
   </div>
-
-  <!-- 方案 3 -->
-  <div class="scheme s3">
-    <div class="sh">
-      <h2 style="color:var(--p)">青绿自然</h2>
-      <p>米白底 · 青绿主色 · 参考自然/绿植/品质</p>
-      <div class="hint">舒适耐看 · "合格"心理暗示</div>
-    </div>
-    <div class="sw">
-      <div class="swatch" style="background:#3B7A5E"></div>
-      <div class="swatch" style="background:#24523D"></div>
-      <div class="swatch" style="background:#9A5B23"></div>
-      <div class="swatch" style="background:#2B6B8A"></div>
-      <div class="swatch-lg" style="background:#F6F7F5"></div>
-    </div>
-    <div class="demo">
-      <div class="demo-hd">操作区</div>
-      <div class="btn-row">
-        <div class="btn p"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码验房</div>
-        <div class="btn o"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的任务</div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">数据卡片</div>
-      <div class="card-sm hl" style="margin-bottom:2px;">
-        <div style="font-size:10px;opacity:.7;margin-bottom:4px;">当前户</div>
-        <div style="font-size:14px;font-weight:700;">2#楼 西单元 1层 西户</div>
-        <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;opacity:.75;">待办 3 · 闭环 12</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-cell"><div class="stat-n" style="color:var(--p)">8</div><div class="stat-l">待整改</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--warn)">5</div><div class="stat-l">整改中</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--info)">3</div><div class="stat-l">待复查</div></div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">状态标签</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <span class="tag y">待整改</span>
-        <span class="tag b">整改中</span>
-        <span class="tag g">已闭环</span>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">问题列表</div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">墙面空鼓 · 东墙</span><span class="tag y">待整改</span></div><div class="card-meta"><span>张查验员</span><span>超期 2天</span></div></div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">地面开裂 · 客厅</span><span class="tag b">整改中</span></div><div class="card-meta"><span>李整改员</span><span>今日截止</span></div></div>
-      <div class="dv"></div>
-      <div class="demo-hd">底部导航</div>
-      <div class="tb">
-        <div class="tb-item active"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2 10l8-8 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8a1 1 0 001 1h8a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5"/></svg>工作台</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>任务</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v14H3z" stroke="currentColor" stroke-width="1.5"/><path d="M7 12l2-3 2 2 2-4 2 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>统计</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 方案 4 -->
-  <div class="scheme s4">
-    <div class="sh">
-      <h2 style="color:var(--p)">藏蓝金</h2>
-      <p>深灰蓝主色 · 铜金点缀 · 参考建筑事务所/正式感</p>
-      <div class="hint">沉稳正式 · 偏管理气质</div>
-    </div>
-    <div class="sw">
-      <div class="swatch" style="background:#1E293B"></div>
-      <div class="swatch" style="background:#0F172A"></div>
-      <div class="swatch" style="background:#8B7340"></div>
-      <div class="swatch" style="background:#3B7A5E"></div>
-      <div class="swatch-lg" style="background:#F8F9FA"></div>
-    </div>
-    <div class="demo">
-      <div class="demo-hd">操作区</div>
-      <div class="btn-row">
-        <div class="btn p"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码验房</div>
-        <div class="btn o"><svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的任务</div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">数据卡片</div>
-      <div class="card-sm hl" style="margin-bottom:2px;">
-        <div style="font-size:10px;opacity:.65;margin-bottom:4px;">CURRENT UNIT</div>
-        <div style="font-size:14px;font-weight:700;">2#楼 · 西单元 · 1层西户</div>
-        <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;opacity:.7;">待办 3 · 闭环 12</div>
-      </div>
-      <div class="stat-grid">
-        <div class="stat-cell"><div class="stat-n" style="color:var(--p)">8</div><div class="stat-l">待整改</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--warn)">5</div><div class="stat-l">整改中</div></div>
-        <div class="stat-cell"><div class="stat-n" style="color:var(--info)">3</div><div class="stat-l">待复查</div></div>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">状态标签</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <span class="tag y">待整改</span>
-        <span class="tag b">整改中</span>
-        <span class="tag g">已闭环</span>
-      </div>
-      <div class="dv"></div>
-      <div class="demo-hd">问题列表</div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">墙面空鼓 · 东墙</span><span class="tag y">待整改</span></div><div class="card-meta"><span>张查验员</span><span>超期 2天</span></div></div>
-      <div class="card-sm"><div class="card-row"><span class="card-tl">地面开裂 · 客厅</span><span class="tag b">整改中</span></div><div class="card-meta"><span>李整改员</span><span>今日截止</span></div></div>
-      <div class="dv"></div>
-      <div class="demo-hd">底部导航</div>
-      <div class="tb">
-        <div class="tb-item active"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M2 10l8-8 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 8v8a1 1 0 001 1h8a1 1 0 001-1V8" stroke="currentColor" stroke-width="1.5"/></svg>工作台</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M6 4h8M6 10h8M6 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>任务</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 3v1.5M13 3v1.5M3 7h14" stroke="currentColor" stroke-width="1.5"/></svg>扫码</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M3 3h14v14H3z" stroke="currentColor" stroke-width="1.5"/><path d="M7 12l2-3 2 2 2-4 2 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>统计</div>
-        <div class="tb-item"><svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="7.5" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>我的</div>
-      </div>
-    </div>
-  </div>
-
 </div>
 
-<div class="note">
-  <h3>配色来源说明</h3>
-  <table>
-    <tr><th>方案</th><th>主色灵感</th><th>底色</th><th>适合</th></tr>
-    <tr><td><span style="color:#B45F06;font-weight:600;">工程灰橙</span></td><td>安全帽 / 警示标识 / 混凝土</td><td>暖灰 #F5F3EF</td><td>一线现场、户外强光、工人使用</td></tr>
-    <tr><td><span style="color:#1A56DB;font-weight:600;">图纸蓝白</span></td><td>工程蓝图 / 标准文档 / 施工图纸</td><td>冷白 #F8F9FC</td><td>通用、管理层、多方协作</td></tr>
-    <tr><td><span style="color:#3B7A5E;font-weight:600;">青绿自然</span></td><td>植物 / 品质合格 / 安全通过</td><td>米白 #F6F7F5</td><td>验收导向、监理使用</td></tr>
-    <tr><td><span style="color:#1E293B;font-weight:600;">藏蓝金</span></td><td>建筑事务所 / 正式合同 / 铜牌</td><td>冷白 #F8F9FA</td><td>管理端、正式汇报、导出文档</td></tr>
-  </table>
+<!-- ====== 屏幕 2: 户操作中心 ====== -->
+<div class="phone">
+  <div class="sb"><span class="time">9:41</span><span class="icons"><span>5G</span><span>77</span></span></div>
+  <div class="nh"><span class="back"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#1F2024" stroke-width="1.5"><path d="M12 5l-5 5 5 5"/></svg></span><span class="title">户操作中心</span></div>
+
+  <div class="content">
+    <!-- 户信息卡片 -->
+    <div class="card-accent">
+      <div class="hh-top">
+        <div><span class="hh-name">2#楼 西单元 1层 西户</span><span class="hh-addr">2026-07-12 验收中</span></div>
+        <span class="tag tag-closed">验收中</span>
+      </div>
+      <div class="hh-stats">
+        <div class="hh-s"><span class="n">12</span><span class="l">总问题</span></div>
+        <div class="hh-s"><span class="n w">3</span><span class="l">待处理</span></div>
+        <div class="hh-s"><span class="n g">9</span><span class="l">已闭环</span></div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="act-grid">
+      <div class="act-item">
+        <div class="act-icon ai-blue"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="10" cy="10" r="2.5"/></svg></div>
+        <span class="act-lbl">问题上报</span>
+      </div>
+      <div class="act-item">
+        <div class="act-icon ai-green"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 5v14H3V5"/><path d="M3 1h14v4H3z"/></svg></div>
+        <span class="act-lbl">批量上报</span>
+      </div>
+      <div class="act-item">
+        <div class="act-icon ai-gray"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="10" cy="10" r="2.5"/><path d="M7 3v1.5M13 3v1.5"/></svg></div>
+        <span class="act-lbl">二维码</span>
+      </div>
+      <div class="act-item">
+        <div class="act-icon ai-orange"><svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12l4 4L16 7"/></svg></div>
+        <span class="act-lbl">无问题</span>
+      </div>
+    </div>
+
+    <!-- 问题列表 -->
+    <div class="sec"><span class="sec-title">问题列表</span><span style="font-size:11px;color:#8F9098;">12 项</span></div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+        <div class="issue-left"><div class="issue-dot dot-warn"></div><div><span class="issue-title">墙面空鼓 · 东墙</span><span class="issue-meta">观感 · 墙面 · 张查验员</span></div></div>
+        <span class="tag tag-pending">待整改</span>
+      </div></div>
+      <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+        <div class="issue-left"><div class="issue-dot dot-blue"></div><div><span class="issue-title">客厅净高偏差8mm</span><span class="issue-meta">实测 · 净高 · 张查验员</span></div></div>
+        <span class="tag tag-progress">整改中</span>
+      </div></div>
+      <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+        <div class="issue-left"><div class="issue-dot dot-purple"></div><div><span class="issue-title">灭火器缺失</span><span class="issue-meta">公区 · 消防 · 王监理</span></div></div>
+        <span class="tag tag-review">待复查</span>
+      </div></div>
+      <div class="card" style="padding:10px 14px;"><div class="issue-row" style="border:none;padding:0;">
+        <div class="issue-left"><div class="issue-dot dot-green"></div><div><span class="issue-title">主卧窗玻璃划痕</span><span class="issue-meta">观感 · 门窗 · 张查验员</span></div></div>
+        <span class="tag tag-closed">已闭环</span>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== 屏幕 3: 任务列表 ====== -->
+<div class="phone">
+  <div class="sb"><span class="time">9:41</span><span class="icons"><span>5G</span><span>77</span></span></div>
+  <div class="nh"><span class="title">任务</span></div>
+  <div class="content">
+    <div class="seg">
+      <div class="seg-item active">待整改</div>
+      <div class="seg-item">整改中</div>
+      <div class="seg-item">待复查</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div><span style="font-size:14px;font-weight:600;color:#1F2024;">墙面空鼓 · 东墙</span><br><span style="font-size:11px;color:#8F9098;">2#楼西单元1层西户</span></div>
+          <span class="tag tag-pending">待整改</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#8F9098;">
+          <span>张查验员 上报</span><span style="color:#ED3241;font-weight:500;">已超期 2天</span>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div><span style="font-size:14px;font-weight:600;color:#1F2024;">地面开裂 · 客厅</span><br><span style="font-size:11px;color:#8F9098;">3#楼东单元5层东户</span></div>
+          <span class="tag tag-pending">待整改</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#8F9098;">
+          <span>王监理 上报</span><span>截止 7/15</span>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div><span style="font-size:14px;font-weight:600;color:#1F2024;">阳台防水不到位</span><br><span style="font-size:11px;color:#8F9098;">1#楼西单元2层西户</span></div>
+          <span class="tag tag-pending">待整改</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#8F9098;">
+          <span>张查验员 上报</span><span>截止 7/14</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tb">
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l7-7 7 7"/><path d="M5 7v8a1 1 0 001 1h8a1 1 0 001-1V7"/></svg>首页</div>
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h14v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M2 4a1 1 0 011-1h14a1 1 0 011 1v3H2V4z"/></svg>档案</div>
+    <div class="tb-item tb-center"><div class="scan-btn"><svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="10" cy="10" r="2.5"/><path d="M7 3v1.5M13 3v1.5"/></svg></div><span style="font-size:10px;color:#8F9098;margin-top:-4px;">扫码</span></div>
+    <div class="tb-item active"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h8M6 10h8M6 16h8"/></svg>任务</div>
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7.5" r="2"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4"/></svg>我的</div>
+  </div>
+</div>
+
+<!-- ====== 屏幕 4: 档案 / 扫码 ====== -->
+<div class="phone">
+  <div class="sb"><span class="time">9:41</span><span class="icons"><span>5G</span><span>77</span></span></div>
+  <div class="nh"><span class="title">扫码验房</span></div>
+  <div class="content">
+    <!-- 扫码区域 -->
+    <div class="hero" style="padding:40px 20px;">
+      <div class="hero-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#006FFD" stroke-width="2"><rect x="8" y="8" width="16" height="16" rx="3"/><circle cx="16" cy="16" r="4"/></svg></div>
+      <span class="hero-title">扫码验房</span>
+      <span class="hero-hint">扫描入户门二维码，进入该户操作中心</span>
+      <div class="btn" style="width:200px;">开始扫码</div>
+      <span style="font-size:13px;color:#006FFD;">手动选择楼栋 →</span>
+    </div>
+  </div>
+  <div class="tb">
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l7-7 7 7"/><path d="M5 7v8a1 1 0 001 1h8a1 1 0 001-1V7"/></svg>首页</div>
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h14v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7z"/><path d="M2 4a1 1 0 011-1h14a1 1 0 011 1v3H2V4z"/></svg>档案</div>
+    <div class="tb-item tb-center active"><div class="scan-btn"><svg viewBox="0 0 20 20" fill="none" stroke="#fff" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="10" cy="10" r="2.5"/><path d="M7 3v1.5M13 3v1.5"/></svg></div><span style="font-size:10px;color:#006FFD;margin-top:-4px;">扫码</span></div>
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h8M6 10h8M6 16h8"/></svg>任务</div>
+    <div class="tb-item"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7.5" r="2"/><path d="M5 16c0-2.5 2.2-4 5-4s5 1.5 5 4"/></svg>我的</div>
+  </div>
 </div>
 
 </body>
