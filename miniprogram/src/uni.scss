@@ -1,8 +1,13 @@
 @import '@/styles/tokens.scss';
 
 // === 微动画关键帧 ===
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(12px); }
+@keyframes cardAppear {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -38,21 +43,21 @@ page {
 
 // 所有卡片添加微动效
 .card, .card-accent, .m-card, .check-card, [class*="card-"] {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 // 按钮点击反馈
 .btn-primary, .btn-outline, [class*="btn-"], [class*="action-card"] {
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-primary:active, .btn-outline:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
   opacity: 0.9;
 }
 
 // 列表项逐条淡入
-.card, .i-row, .issue-row, .tl-item, .recent-item, .select-row {
-  animation: fadeInUp 0.35s ease both;
+.i-row, .issue-row, .tl-item, .recent-item, .select-row {
+  animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 // 每项延迟递增，产生级联效果
 .card:nth-child(1), .i-row:nth-child(1), .issue-row:nth-child(1) { animation-delay: 0.02s; }
@@ -75,12 +80,12 @@ page {
 
 // 标签切换动画
 .seg-item, .seg-item-lg {
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 // 底部操作栏
 .submit-bar, .bb {
-  animation: fadeInUp 0.3s ease;
+  animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 // 微信小程序原生 input/textarea 不兼容 Web box-sizing。
@@ -99,11 +104,18 @@ textarea {
   min-height: 60px;
 }
 
+// 毛玻璃卡片（所有卡片共享）
+.card, .card-accent, .m-card, [class*="card-"] {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: 1px solid rgba(255,255,255,0.7);
+}
+
 // 信息卡片（带左色条）
 .card-accent {
-  background: $bg-card;
-  border-radius: $radius-md;
-  border: 1px solid $border;
   position: relative;
   padding: $sp-lg;
 
@@ -121,9 +133,6 @@ textarea {
 
 // 普通卡片
 .card {
-  background: $bg-card;
-  border-radius: $radius-md;
-  border: 1px solid $border;
   padding: $sp-lg;
 }
 
@@ -194,4 +203,44 @@ textarea {
 // 页面内边距
 .page {
   padding: 0 $sp-lg 20px;
+}
+
+// === iOS 分段控件 ===
+.seg {
+  display: flex;
+  background: rgba(118, 118, 128, 0.12);
+  border-radius: 9px;
+  padding: 2px;
+  margin-bottom: 16px;
+  animation: cardAppear 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.seg-item {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8E8E93;
+  border-radius: 7px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.seg-item.active {
+  background: #fff;
+  color: #007AFF;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+// === Skeleton shimmer ===
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+// === Toast 顶部滑入 ===
+@keyframes toastDrop {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
