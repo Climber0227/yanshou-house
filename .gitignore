@@ -9,3 +9,4 @@ Android/
 Mobile Apps*.svg
 .superpowers/
 .worktrees/
+*.timestamp-*.mjs

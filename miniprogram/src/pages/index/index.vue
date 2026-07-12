@@ -1,40 +1,62 @@
 <template>
 <view class="page">
-  <!-- 顶部 -->
+  <!-- 顶部：用户信息（紧凑）+ 通知 -->
   <view class="top-row">
-    <view class="user-left">
+    <view class="user-pill">
       <view class="avatar">{{ (user?.nickname || '?').charAt(0) }}</view>
-      <view>
+      <view class="user-info">
         <text class="user-name">{{ user?.nickname || '未登录' }}</text>
         <text class="user-role">{{ user?.roleName || '' }}</text>
       </view>
     </view>
     <view class="notif" @click="goNotif">
-      <text class="notif-icon">&#9993;</text>
+      <text class="notif-icon">🔔</text>
       <view v-if="unread > 0" class="badge">{{ unread }}</view>
     </view>
   </view>
 
-  <!-- 统计 -->
+  <!-- 大标题 -->
+  <view class="hero">
+    <text class="hero-title">工作台</text>
+  </view>
+
+  <!-- 统计卡片：2x2 毛玻璃网格 -->
   <Skeleton v-if="loading" type="stat" :count="4" />
-  <template v-else>
-    <view class="stat-row">
-      <view class="stat-cell"><text class="stat-num">{{ stats.totalHouseholds }}</text><text class="stat-lbl">总户数</text></view>
-      <view class="stat-cell"><text class="stat-num blue">{{ stats.checkedHouseholds }}</text><text class="stat-lbl">已排查</text></view>
-      <view class="stat-cell"><text class="stat-num">{{ stats.totalIssues }}</text><text class="stat-lbl">问题总数</text></view>
-      <view class="stat-cell"><text class="stat-num green">{{ stats.closedCount }}</text><text class="stat-lbl">已闭环</text></view>
+  <view v-else class="stats-grid">
+    <view class="stat-card" @click="switchTabTask">
+      <text class="stat-lbl">总户数</text>
+      <text class="stat-val">{{ stats.totalHouseholds }}</text>
     </view>
-    <view class="stat-row">
-      <view class="stat-cell"><text class="stat-num warn">{{ stats.pendingCount }}</text><text class="stat-lbl">待整改</text></view>
-      <view class="stat-cell"><text class="stat-num blue">{{ stats.rectifyingCount }}</text><text class="stat-lbl">整改中</text></view>
-      <view class="stat-cell"><text class="stat-num purple">{{ stats.pendingReviewCount }}</text><text class="stat-lbl">待复查</text></view>
-      <view class="stat-cell"><text class="stat-num" :class="stats.rectifyRate >= 0.8 ? 'green' : 'warn'">{{ (stats.rectifyRate * 100).toFixed(0) }}%</text><text class="stat-lbl">完成率</text></view>
+    <view class="stat-card" @click="switchTabTask">
+      <text class="stat-lbl">已排查</text>
+      <text class="stat-val blue">{{ stats.checkedHouseholds }}</text>
+      <text class="stat-sub" v-if="stats.totalHouseholds">完成率 {{ (stats.checkedHouseholds / stats.totalHouseholds * 100).toFixed(1) }}%</text>
     </view>
-  </template>
+    <view class="stat-card" @click="goLibrary">
+      <text class="stat-lbl">问题总数</text>
+      <text class="stat-val">{{ stats.totalIssues }}</text>
+    </view>
+    <view class="stat-card" @click="switchTabTask">
+      <text class="stat-lbl">已闭环</text>
+      <text class="stat-val green">{{ stats.closedCount }}</text>
+    </view>
+  </view>
+
+  <!-- 进度条 -->
+  <view v-if="stats.totalHouseholds" class="progress-bar-bg">
+    <view class="progress-bar-fill" :style="{ width: (stats.checkedHouseholds / stats.totalHouseholds * 100) + '%' }"></view>
+  </view>
 
   <!-- 快速入口 -->
   <view class="quick-acts">
-    <view class="qa-item" @click="goLibrary">问题库</view>
+    <view class="qa-item" @click="goLibrary">
+      <text class="qa-icon">📋</text>
+      <text class="qa-lbl">问题库</text>
+    </view>
+    <view class="qa-item" @click="switchTabTask">
+      <text class="qa-icon">📝</text>
+      <text class="qa-lbl">全部任务</text>
+    </view>
   </view>
 
   <!-- 我的待办 -->
@@ -42,17 +64,21 @@
     <text class="sec-title">我的待办</text>
     <text class="sec-more" @click="switchTabTask">全部 ›</text>
   </view>
-  <view v-if="myIssues.length === 0" class="empty"><text>暂无待办</text></view>
-  <view v-for="i in myIssues" :key="i.id" class="issue-row" @click="goDetail(i)">
-    <view class="issue-l">
-      <view class="dot" :class="dotMap[i.status]"></view>
-      <view>
-        <text class="i-title">{{ i.description }}</text>
-        <text class="i-meta">{{ i.householdName }}</text>
+
+  <Skeleton v-if="loading" type="card" :count="3" />
+  <template v-else>
+    <view v-for="i in myIssues" :key="i.id" class="card" @click="goDetail(i)">
+      <view class="card-row">
+        <view class="dot" :class="dotMap[i.status]"></view>
+        <view class="card-body">
+          <text class="card-title">{{ i.description }}</text>
+          <text class="card-meta">{{ i.householdName }}</text>
+        </view>
+        <text class="tag" :class="tagMap[i.status]">{{ i.statusName }}</text>
       </view>
     </view>
-    <text class="tag" :class="tagMap[i.status]">{{ i.statusName }}</text>
-  </view>
+    <view v-if="myIssues.length === 0" class="empty"><text>暂无待办</text></view>
+  </template>
 </view>
 </template>
 
@@ -67,7 +93,7 @@ const store = useUserStore()
 const user = computed(() => store.user)
 const role = computed(() => store.user?.role || '')
 
-const stats = ref({ totalHouseholds: 0, pendingCount: 0, rectifyingCount: 0, closedCount: 0 })
+const stats = ref({ totalHouseholds: 0, pendingCount: 0, rectifyingCount: 0, closedCount: 0, checkedHouseholds: 0 })
 const myIssues = ref([])
 const unread = ref(0)
 const loading = ref(false)
@@ -81,7 +107,6 @@ async function load() {
     getStatistics(), getRectifyTasks('pending,rectifying'), getPendingReviews(), getNotifications()
   ])
   if (s.code === 0) stats.value = s.data
-  // 按角色合并待办
   let list = []
   if (role.value === 'inspector' || role.value === 'admin' || role.value === 'supervisor') {
     if (r.code === 0) list = list.concat(r.data.list || [])
@@ -101,51 +126,65 @@ function goLibrary() { uni.navigateTo({ url: '/pages/problem-library/problem-lib
 
 onMounted(() => load())
 onShow(() => load())
-
 onShareAppMessage(() => ({ title: '分户验收 - 工作台', path: '/pages/index/index' }))
 </script>
 
 <style scoped>
 .page { padding: 0 16px 20px; }
-.top-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; }
-.user-left { display: flex; align-items: center; gap: 10px; }
-.avatar { width: 36px; height: 36px; border-radius: 10px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
-.user-name { font-size: 15px; font-weight: 600; color: #1F2024; display: block; }
-.user-role { font-size: 11px; color: #8F9098; }
-.notif { position: relative; }
-.notif-icon { font-size: 20px; color: #71727A; }
-.badge { position: absolute; top: -4px; right: -6px; background: #ED3241; color: #fff; font-size: 9px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
 
-.stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 6px; margin-bottom: 16px; }
-.stat-cell { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px 4px; text-align: center; }
-.stat-num { font-size: 20px; font-weight: 700; color: #1F2024; display: block; line-height: 1.2; }
-.stat-num.warn { color: #FF9500; }
-.stat-num.blue { color: #006FFD; }
-.stat-num.green { color: #00A86B; }
-.stat-num.purple { color: #7C3AED; }
-.stat-lbl { font-size: 10px; color: #8F9098; margin-top: 2px; }
+/* 顶部 */
+.top-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; }
+.user-pill { display: flex; align-items: center; gap: 8px; }
+.avatar { width: 30px; height: 30px; border-radius: 8px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+.user-name { font-size: 13px; font-weight: 600; color: #1F2024; display: block; line-height: 1.3; }
+.user-role { font-size: 10px; color: #8E8E93; }
+.notif { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+.notif-icon { font-size: 18px; }
+.badge { position: absolute; top: -2px; right: -2px; background: #FF3B30; color: #fff; font-size: 9px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; font-weight: 600; }
 
-.quick-acts { display: flex; gap: 8px; margin-bottom: 12px; }
-.qa-item { padding: 8px 20px; background: #fff; border: 1.5px solid #006FFD; border-radius: 8px; font-size: 13px; font-weight: 600; color: #006FFD; }
+/* 大标题 */
+.hero { padding: 4px 0 16px; }
+.hero-title { font-size: 28px; font-weight: 700; color: #000; letter-spacing: -0.3px; }
 
-.sec { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.sec-title { font-size: 14px; font-weight: 600; color: #1F2024; }
-.sec-more { font-size: 12px; color: #006FFD; }
+/* 统计卡片 2x2 */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.stat-card { background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.7); animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.stat-card:active { transform: scale(0.97); transition: transform 0.15s; }
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.2s; }
+.stat-lbl { font-size: 12px; color: #8E8E93; font-weight: 500; margin-bottom: 4px; letter-spacing: 0.2px; }
+.stat-val { font-size: 26px; font-weight: 700; color: #000; letter-spacing: -0.5px; line-height: 1.1; }
+.stat-val.blue { color: #007AFF; }
+.stat-val.green { color: #34C759; }
+.stat-sub { font-size: 11px; color: #8E8E93; margin-top: 2px; }
 
-.issue-row { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px; margin-bottom: 6px; }
-.issue-l { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* 进度条 */
+.progress-bar-bg { height: 3px; background: rgba(118,118,128,0.12); border-radius: 2px; margin: 4px 0 16px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #007AFF; border-radius: 2px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* 快速入口 */
+.quick-acts { display: flex; gap: 10px; margin-bottom: 20px; }
+.qa-item { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.7); }
+.qa-item:active { transform: scale(0.97); transition: transform 0.15s; }
+.qa-icon { font-size: 18px; }
+.qa-lbl { font-size: 13px; font-weight: 600; color: #007AFF; }
+
+/* 待办列表 */
+.sec { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sec-title { font-size: 17px; font-weight: 600; color: #000; letter-spacing: -0.2px; }
+.sec-more { font-size: 13px; color: #007AFF; font-weight: 500; }
+
+.card-row { display: flex; align-items: center; gap: 10px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
 .dot-warn { background: #FF9500; }
-.dot-blue { background: #006FFD; }
-.dot-purple { background: #7C3AED; }
-.dot-green { background: #00A86B; }
-.i-title { font-size: 13px; font-weight: 600; color: #1F2024; display: block; }
-.i-meta { font-size: 10px; color: #8F9098; margin-top: 2px; display: block; }
+.dot-blue { background: #007AFF; }
+.dot-purple { background: #AF52DE; }
+.dot-green { background: #34C759; }
+.card-body { flex: 1; min-width: 0; }
+.card-title { font-size: 14px; font-weight: 600; color: #000; display: block; line-height: 1.3; }
+.card-meta { font-size: 12px; color: #8E8E93; margin-top: 2px; display: block; }
 
-.tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }
-.tag-pending { background: #FFF3E0; color: #E65100; }
-.tag-progress { background: #EAF2FF; color: #006FFD; }
-.tag-review { background: #F3E8FF; color: #7C3AED; }
-.tag-closed { background: #E8F5E9; color: #2E7D32; }
-.empty { padding: 40px 0; text-align: center; color: #8F9098; font-size: 13px; }
+.empty { padding: 40px 0; text-align: center; color: #8E8E93; font-size: 13px; }
 </style>
