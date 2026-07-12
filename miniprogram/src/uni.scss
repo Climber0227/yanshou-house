@@ -41,8 +41,8 @@ page {
   min-height: 100vh;
 }
 
-// 所有卡片添加微动效
-.card, .card-accent, .m-card, .check-card, [class*="card-"] {
+// 所有卡片添加微动效（显式列出卡片变体，避免匹配 .card-top .card-meta 等子元素）
+.card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
   animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -104,8 +104,8 @@ textarea {
   min-height: 60px;
 }
 
-// 毛玻璃卡片（所有卡片共享）
-.card, .card-accent, .m-card, [class*="card-"] {
+// 毛玻璃卡片（所有卡片共享，显式列出变体避免匹配子元素）
+.card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
