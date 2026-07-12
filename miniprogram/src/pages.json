@@ -18,7 +18,9 @@
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "分户验收",
     "navigationBarBackgroundColor": "#006FFD",
-    "backgroundColor": "#F8F9FE"
+    "backgroundColor": "#F8F9FE",
+    "animationType": "slide-in-right",
+    "animationDuration": 300
   },
   "tabBar": {
     "color": "#8F9098",
