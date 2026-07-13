@@ -373,7 +373,7 @@ function roomLabel(r) {
 
 function saveDraftLocal() {
   const tabData = activeType.value === 'visual' ? visualItems.value : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) } : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
-  saveDraft(householdId.value, activeType.value, { ...tabData, deadline: deadline.value, rectifierName: rectifierName.value, rectifierPhone: rectifierPhone.value })
+  saveDraft(householdId.value, activeType.value, { ...tabData, deadline: deadline.value, rectifierName: rectifier.value.name, rectifierPhone: rectifier.value.phone })
   uni.showToast({ title: '已保存', icon: 'none', duration: 1000 })
 }
 
@@ -413,7 +413,7 @@ async function submitInspection() {
           const v = pm[m.key]
           const ev = estimatedValues[m.key]
           if (v && ev && Math.abs(parseInt(v) - ev) > 5) {
-            issueList.push({ householdId: householdId.value, type: 'public', category: item.name, description: `${m.label}实测${v}mm偏差超限`, photos: [], remark: '' })
+            issueList.push({ householdId: householdId.value, type: 'public', category: item.name, description: `${m.label}实测${v}mm偏差超限`, photos: [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
           }
         }
       }
