@@ -65,7 +65,8 @@ onHide(() => {
 @import '@/styles/tokens.scss';
 
 .app-root { position: relative; min-height: 100vh; overflow: hidden; }
-.bg-deco-1, .bg-deco-2 { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
-.bg-deco-1 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,111,253,0.04) 0%, transparent 70%); top: -80px; right: -80px; }
-.bg-deco-2 { width: 200px; height: 200px; background: radial-gradient(circle, rgba(0,168,107,0.03) 0%, transparent 70%); bottom: 10%; left: -60px; }
+.bg-deco-1, .bg-deco-2, .bg-deco-3 { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; }
+.bg-deco-1 { width: 320px; height: 320px; background: radial-gradient(circle, rgba(0,111,253,0.07) 0%, transparent 70%); top: -100px; right: -80px; }
+.bg-deco-2 { width: 220px; height: 220px; background: radial-gradient(circle, rgba(0,168,107,0.05) 0%, transparent 70%); bottom: 15%; left: -70px; }
+.bg-deco-3 { width: 160px; height: 160px; background: radial-gradient(circle, rgba(124,58,237,0.04) 0%, transparent 70%); top: 40%; right: -40px; }
 </style>
