@@ -164,8 +164,7 @@
       </picker>
     </view>
     <view class="bb-rectifier">
-      <input class="bb-inp" v-model="rectifierName" placeholder="整改人姓名" />
-      <input class="bb-inp" v-model="rectifierPhone" type="number" placeholder="整改人手机号" />
+      <RectifierPicker v-model="rectifier" />
     </view>
     <view class="bb-btns">
       <view class="bb-draft" @click="saveDraftLocal">暂存</view>
@@ -176,21 +175,21 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { INSPECTION_FORMS } from '@/config/inspection-forms'
 import { saveDraft, loadDraft, removeDraft, enqueue } from '@/utils/storage'
 import { compressImages } from '@/utils/media'
 import { reportIssue, getEstimatedValues } from '@/api'
 import InspectItem from '@/components/InspectItem.vue'
+import RectifierPicker from '@/components/RectifierPicker.vue'
 
 const types = [{ key: 'visual', label: '观感' }, { key: 'measure', label: '实测' }, { key: 'public', label: '公区' }]
 const activeType = ref('visual')
 const householdId = ref('')
 const submitting = ref(false)
 const deadline = ref('')
-const rectifierName = ref('')
-const rectifierPhone = ref('')
+const rectifier = ref({ name: '', phone: '' })
 const visualItems = ref([])
 const md = reactive({})  // measure data
 const sd = reactive({})  // sub-item data
@@ -253,7 +252,7 @@ function initPubMeasures() {
 function switchType(key) {
   // 保存草稿（含 deadline）
   const tabDraft = activeType.value === 'visual' ? { items: visualItems.value } : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) } : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
-  saveDraft(householdId.value, activeType.value, { ...tabDraft, deadline: deadline.value, rectifierName: rectifierName.value, rectifierPhone: rectifierPhone.value })
+  saveDraft(householdId.value, activeType.value, { ...tabDraft, deadline: deadline.value, rectifierName: rectifier.value.name, rectifierPhone: rectifier.value.phone })
 
   activeType.value = key
   if (key === 'visual') initVisual()
@@ -263,8 +262,7 @@ function switchType(key) {
   const saved = loadDraft(householdId.value, key)
   if (saved) {
     if (saved.deadline) deadline.value = saved.deadline
-    if (saved.rectifierName) rectifierName.value = saved.rectifierName
-    if (saved.rectifierPhone) rectifierPhone.value = saved.rectifierPhone
+    if (saved.rectifierName) rectifier.value = { name: saved.rectifierName, phone: saved.rectifierPhone || '' }
     if (key === 'visual' && saved.items) visualItems.value = saved.items
     if (key === 'public') {
       if (saved.pvs) Object.assign(pubVisualState, JSON.parse(JSON.stringify(saved.pvs)))
@@ -381,12 +379,11 @@ function saveDraftLocal() {
 
 async function submitInspection() {
   if (submitting.value) return
-  if (!rectifierName.value) { uni.showToast({ title: '请填写整改人姓名', icon: 'none' }); submitting.value = false; return }
-  if (!rectifierPhone.value) { uni.showToast({ title: '请填写整改人手机号', icon: 'none' }); submitting.value = false; return }
+  if (!rectifier.value.name) { uni.showToast({ title: '请选择整改人', icon: 'none' }); submitting.value = false; return }
   submitting.value = true
 
-  const rName = rectifierName.value
-  const rPhone = rectifierPhone.value
+  const rName = rectifier.value.name
+  const rPhone = rectifier.value.phone
   const issueList = []
 
   if (activeType.value === 'visual') {
@@ -465,8 +462,7 @@ onLoad(async (options) => {
   const saved = loadDraft(householdId.value, 'visual')
   if (saved) {
     if (saved.deadline) deadline.value = saved.deadline
-    if (saved.rectifierName) rectifierName.value = saved.rectifierName
-    if (saved.rectifierPhone) rectifierPhone.value = saved.rectifierPhone
+    if (saved.rectifierName) rectifier.value = { name: saved.rectifierName, phone: saved.rectifierPhone || '' }
     if (saved.items) visualItems.value = saved.items
   }
   // 加载推算值（从后端/Mock）

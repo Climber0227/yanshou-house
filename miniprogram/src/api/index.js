@@ -31,3 +31,4 @@ export async function getStatistics() { return mock.mockGetStatistics() }
 export async function getAllIssues(buildingId) { return mock.mockGetAllIssues(buildingId) }
 export async function getEstimatedValues() { return mock.mockGetEstimatedValues() }
 export async function checkOverdue() { return mock.mockCheckOverdue() }
+export async function searchRectifiers(query) { return mock.mockSearchRectifiers(query) }

@@ -77,10 +77,7 @@
     <!-- 指定整改人 -->
     <view class="form-group">
       <text class="form-label">指定整改人 <text class="req">*</text></text>
-      <view class="row-2col">
-        <input class="input" v-model="rectifierName" placeholder="整改人姓名" />
-        <input class="input" v-model="rectifierPhone" type="number" placeholder="整改人手机号" />
-      </view>
+      <RectifierPicker v-model="rectifier" />
     </view>
 
     <!-- 提交 -->
@@ -95,6 +92,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getBuildings, getHouseholds, getIssuePresets, batchReportIssues } from '@/api'
+import RectifierPicker from '@/components/RectifierPicker.vue'
 
 const types = [
   { value: 'visual', label: '观感' },
@@ -109,8 +107,7 @@ const presets = ref([])
 const photos = ref([])
 const selB = ref('')
 const submitting = ref(false)
-const rectifierName = ref('')
-const rectifierPhone = ref('')
+const rectifier = ref({ name: '', phone: '' })
 
 const form = ref({ type: 'visual', description: '', category: '' })
 
@@ -155,8 +152,7 @@ async function submitBatch() {
     uni.showToast({ title: '请选择问题描述', icon: 'none' })
     return
   }
-  if (!rectifierName.value) { uni.showToast({ title: '请指定整改人姓名', icon: 'none' }); return }
-  if (!rectifierPhone.value) { uni.showToast({ title: '请填写整改人手机号', icon: 'none' }); return }
+  if (!rectifier.value.name) { uni.showToast({ title: '请选择整改人', icon: 'none' }); return }
   submitting.value = true
   const r = await batchReportIssues({
     householdIds: checkedIds.value,
@@ -165,8 +161,8 @@ async function submitBatch() {
     description: form.value.description,
     photos: photos.value,
     remark: '',
-    rectifierName: rectifierName.value,
-    rectifierPhone: rectifierPhone.value
+    rectifierName: rectifier.value.name,
+    rectifierPhone: rectifier.value.phone
   })
   submitting.value = false
   if (r.code === 0) {

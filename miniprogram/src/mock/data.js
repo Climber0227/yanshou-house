@@ -6,7 +6,11 @@ const mockUsers = {
   'u_001': { id: 'u_001', nickname: '张查验', avatar: '', role: 'inspector', roleName: '查验员', phone: '13800001001', buildingIds: ['b_001', 'b_002'] },
   'u_002': { id: 'u_002', nickname: '李整改', avatar: '', role: 'rectifier', roleName: '整改员', phone: '13800001002', buildingIds: ['b_001'] },
   'u_003': { id: 'u_003', nickname: '王监理', avatar: '', role: 'supervisor', roleName: '监理', phone: '13800001003', buildingIds: ['b_001', 'b_002', 'b_003'] },
-  'u_004': { id: 'u_004', nickname: '赵管理', avatar: '', role: 'admin', roleName: '管理员', phone: '13800001004', buildingIds: ['b_001', 'b_002', 'b_003', 'b_004'] }
+  'u_004': { id: 'u_004', nickname: '赵管理', avatar: '', role: 'admin', roleName: '管理员', phone: '13800001004', buildingIds: ['b_001', 'b_002', 'b_003', 'b_004'] },
+  'u_005': { id: 'u_005', nickname: '陈建工', avatar: '', role: 'rectifier', roleName: '整改员', phone: '13800001005', buildingIds: ['b_002', 'b_003'] },
+  'u_006': { id: 'u_006', nickname: '刘施工', avatar: '', role: 'rectifier', roleName: '整改员', phone: '13800001006', buildingIds: ['b_004', 'b_005'] },
+  'u_007': { id: 'u_007', nickname: '吴装饰', avatar: '', role: 'rectifier', roleName: '整改员', phone: '13800001007', buildingIds: ['b_001', 'b_004'] },
+  'u_008': { id: 'u_008', nickname: '周安装', avatar: '', role: 'rectifier', roleName: '整改员', phone: '13800001008', buildingIds: ['b_003', 'b_005'] }
 }
 
 // ========== 楼栋 ==========

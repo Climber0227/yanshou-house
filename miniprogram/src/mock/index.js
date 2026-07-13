@@ -328,6 +328,18 @@ export async function mockGetAllIssues(buildingId) {
   return ok({ list, total: list.length })
 }
 
+// ========== 搜索整改人 ==========
+export async function mockSearchRectifiers(query) {
+  await delay(150)
+  const rectifiers = Object.values(data.mockUsers).filter(u => u.role === 'rectifier')
+  if (!query) return ok({ list: rectifiers })
+  const q = query.trim().toLowerCase()
+  const matched = rectifiers.filter(u =>
+    u.nickname.includes(q) || u.phone.includes(q)
+  )
+  return ok({ list: matched })
+}
+
 // ========== 超期提醒 ==========
 export async function mockCheckOverdue() {
   await delay(100)
