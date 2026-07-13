@@ -119,14 +119,14 @@ onLoad((options) => {
 .page { padding: 0 $sp-lg 20px; display: flex; flex-direction: column; align-items: center; }
 .loading-state { padding: 80px 20px; text-align: center; }
 
-.qr-card { background: $bg-card; border: 1px solid $border; border-radius: $radius-md; padding: 24px; margin: 16px 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+.qr-card { background: $bg-card; border: 1px solid $border; border-radius: $radius-md; padding: 24px; margin: 16px 0; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
 .qr-title { font-size: $fs-lg; font-weight: 700; color: $text-primary; margin-bottom: 16px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .qr-code-area { width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; background: $bg-card; border: 1px solid $border; border-radius: $radius-sm; }
 .qr-canvas { width: 220px; height: 220px; }
 .qr-subtext { font-size: $fs-md; font-weight: 600; color: $text-primary; margin-top: $sp-md; text-align: center; }
 .qr-hint { font-size: $fs-xs; color: $text-hint; margin-top: $sp-xs; text-align: center; }
 
-.info-card { background: $bg-card; border: 1px solid $border; border-radius: $radius-md; padding: $sp-lg; width: 100%; margin-bottom: $sp-lg; }
+.info-card { background: $bg-card; border: 1px solid $border; border-radius: $radius-md; padding: $sp-lg; width: 100%; margin-bottom: $sp-lg; box-sizing: border-box; }
 .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid $border-light; font-size: $fs-md; }
 .info-row:last-child { border-bottom: none; }
 .info-lbl { color: $text-secondary; }

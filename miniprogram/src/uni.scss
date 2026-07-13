@@ -32,13 +32,16 @@
 }
 
 // === 全局过渡 ===
-page {
+page, .page {
   background: linear-gradient(180deg, #DBE8FF 0%, #EEF4FF 200px, #F5F7FA 55%, #E8ECF2 100%);
   color: $text-primary;
   font-size: $fs-md;
   line-height: 1.5;
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 // iOS 风格分段标题（带左边色条）
