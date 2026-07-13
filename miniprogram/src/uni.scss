@@ -62,11 +62,6 @@ page {
     background: linear-gradient(180deg, $primary, rgba(0, 111, 253, 0.3));
   }
 }
-  font-size: $fs-md;
-  line-height: 1.5;
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  min-height: 100vh;
-}
 
 // 所有卡片添加微动效（显式列出卡片变体，避免匹配 .card-top .card-meta 等子元素）
 .card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
