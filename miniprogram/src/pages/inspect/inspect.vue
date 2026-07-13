@@ -476,69 +476,69 @@ onLoad(async (options) => {
 </script>
 
 <style lang="scss" scoped>
-.page { padding: 0 12px; background: #F8F9FE; width: 100%; box-sizing: border-box; overflow-x: hidden; }
+.page { padding: 0 12px; width: 100%; box-sizing: border-box; overflow-x: hidden; }
 .seg-lg { display: flex; gap: 6px; margin: 12px 0; }
-.seg-item-lg { flex: 1; text-align: center; padding: 10px; border-radius: 6px; border: 1px solid #E8E9F1; font-size: 13px; color: #71727A; }
-.seg-item-lg.active { background: #EAF2FF; color: #006FFD; border-color: #006FFD; font-weight: 600; }
+.seg-item-lg { flex: 1; text-align: center; padding: 10px; border-radius: 6px; border: 1px solid $border; font-size: 13px; color: $text-secondary; }
+.seg-item-lg.active { background: $primary-light; color: $primary; border-color: $primary; font-weight: 600; }
 
 /* 实测卡片 */
-.m-card { background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px; margin-bottom: 8px; box-sizing: border-box; max-width: 100%; }
+.m-card { padding: 12px; margin-bottom: 8px; box-sizing: border-box; max-width: 100%; }
 .m-hd { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; min-width: 0; }
-.m-name { font-size: 13px; font-weight: 600; color: #1F2024; display: block; }
-.m-desc { font-size: 10px; color: #71727A; margin-top: 2px; }
-.m-room, .m-single { padding: 8px; background: #F8F9FE; border-radius: 6px; margin-bottom: 6px; box-sizing: border-box; }
+.m-name { font-size: 13px; font-weight: 600; color: $text-primary; display: block; }
+.m-desc { font-size: 10px; color: $text-secondary; margin-top: 2px; }
+.m-room, .m-single { padding: 8px; background: $bg-page; border-radius: 6px; margin-bottom: 6px; box-sizing: border-box; }
 
 /* 公区视觉检查子项（楼梯） */
-.sub-check-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid #F0F1F5; }
+.sub-check-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid $border-light; }
 .sub-check-row:last-child { border-bottom: none; }
-.sub-check-label { flex: 1; font-size: 12px; color: #1F2024; min-width: 0; }
+.sub-check-label { flex: 1; font-size: 12px; color: $text-primary; min-width: 0; }
 .check-hd { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
-.check-num { width: 22px; height: 22px; border-radius: 50%; background: #EAF2FF; color: #006FFD; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.check-num { width: 22px; height: 22px; border-radius: 50%; background: $primary-light; color: $primary; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 .check-info { flex: 1; min-width: 0; }
-.check-name { font-size: 13px; font-weight: 600; color: #1F2024; }
+.check-name { font-size: 13px; font-weight: 600; color: $text-primary; }
 
-.check-toggle-inline { padding: 3px 12px; border-radius: 14px; font-size: 10px; font-weight: 600; background: #FEF2F2; color: #ED3241; flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; min-width: 48px; justify-content: center; }
-.check-toggle-inline.pass { background: #F0FDF4; color: #00A86B; }
+.check-toggle-inline { padding: 3px 12px; border-radius: 14px; font-size: 10px; font-weight: 600; background: #FEF2F2; color: $danger; flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; min-width: 48px; justify-content: center; }
+.check-toggle-inline.pass { background: #F0FDF4; color: $success; }
 
 /* 实测差值 */
 .diff-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 10px; margin-top: 4px; }
-.diff-pass { color: #00A86B; font-weight: 600; }
-.diff-fail { color: #ED3241; font-weight: 600; }
+.diff-pass { color: $success; font-weight: 600; }
+.diff-fail { color: $danger; font-weight: 600; }
 
 /* 公区视觉5-15 */
 .preset-r { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.preset-item { padding: 3px 8px; border: 1px solid #E8E9F1; border-radius: 4px; font-size: 10px; color: #71727A; }
-.preset-item.selected { background: #EAF2FF; border-color: #006FFD; color: #006FFD; }
-.textarea { width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 0; padding-bottom: 0; border: 1px solid #E8E9F1; border-radius: 6px; font-size: 12px; min-height: 40px; line-height: 20px; margin-top: 6px; box-sizing: border-box; max-width: 100%; }
+.preset-item { padding: 3px 8px; border: 1px solid $border; border-radius: 4px; font-size: 10px; color: $text-secondary; }
+.preset-item.selected { background: $primary-light; border-color: $primary; color: $primary; }
+.textarea { width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 0; padding-bottom: 0; border: 1px solid $border; border-radius: 6px; font-size: 12px; min-height: 40px; line-height: 20px; margin-top: 6px; box-sizing: border-box; max-width: 100%; }
 
-/* 照片网格 — 与 InspectItem 保持统一 */
+/* 照片网格 */
 .photo-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
-.photo-i { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #F0F1F5; }
+.photo-i { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: $border-light; }
 .photo-i image { width: 100%; height: 100%; }
 .photo-d { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.photo-a { aspect-ratio: 1; border: 1px dashed #C5C6CC; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.photo-a-icon { font-size: 22px; color: #8F9098; line-height: 1; }
-.photo-a-t { font-size: 10px; color: #8F9098; margin-top: 2px; }
+.photo-a { aspect-ratio: 1; border: 1px dashed $text-placeholder; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.photo-a-icon { font-size: 22px; color: $text-hint; line-height: 1; }
+.photo-a-t { font-size: 10px; color: $text-hint; margin-top: 2px; }
 
-/* 视频/语音按钮 — 与 InspectItem 保持统一 */
+/* 视频/语音按钮 */
 .media-row { display: flex; gap: 6px; margin-top: 6px; }
-.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 4px 0; border: 1px solid #E8E9F1; border-radius: 4px; font-size: 10px; color: #71727A; position: relative; }
-.media-del { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: #ED3241; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
-.mr-label { font-size: 12px; font-weight: 600; color: #1F2024; }
+.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 4px 0; border: 1px solid $border; border-radius: 4px; font-size: 10px; color: $text-secondary; position: relative; }
+.media-del { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: $danger; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
+.mr-label { font-size: 12px; font-weight: 600; color: $text-primary; }
 .mr-row { display: flex; gap: 6px; margin-top: 4px; }
 .mr-cell { flex: 1; min-width: 0; }
 .mr-cell.estimated { flex: .55; opacity: .6; min-width: 0; }
-.mr-lbl { font-size: 10px; color: #8F9098; display: block; }
-.mr-val { font-size: 13px; font-weight: 600; color: #1F2024; padding: 6px 0; }
-.mr-inp { width: 100%; max-width: 100%; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 40px; line-height: 40px; border: 1px solid #E8E9F1; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: #fff; text-align: right; }
+.mr-lbl { font-size: 10px; color: $text-hint; display: block; }
+.mr-val { font-size: 13px; font-weight: 600; color: $text-primary; padding: 6px 0; }
+.mr-inp { width: 100%; max-width: 100%; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 40px; line-height: 40px; border: 1px solid $border; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: $bg-card; text-align: right; }
 
 /* 底部 */
-.bb { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #E8E9F1; padding: 10px 16px 20px; }
-.bb-status { font-size: 11px; color: #8F9098; margin-bottom: 6px; display: flex; align-items: center; }
-.bb-deadline { font-size: 11px; color: #006FFD; padding: 2px 8px; border: 1px dashed #006FFD; border-radius: 4px; }
+.bb { position: fixed; bottom: 0; left: 0; right: 0; background: $bg-card; border-top: 1px solid $border; padding: 10px 16px 20px; }
+.bb-status { font-size: 11px; color: $text-hint; margin-bottom: 6px; display: flex; align-items: center; }
+.bb-deadline { font-size: 11px; color: $primary; padding: 2px 8px; border: 1px dashed $primary-dim; border-radius: 4px; }
 .bb-rectifier { display: flex; gap: 6px; margin-bottom: 6px; }
-.bb-inp { flex: 1; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 36px; line-height: 36px; border: 1px solid #E8E9F1; border-radius: 6px; font-size: 12px; box-sizing: border-box; background: #fff; }
+.bb-inp { flex: 1; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 36px; line-height: 36px; border: 1px solid $border; border-radius: 6px; font-size: 12px; box-sizing: border-box; background: $bg-card; }
 .bb-btns { display: flex; gap: 10px; }
-.bb-draft { flex: 1; text-align: center; padding: 10px; border: 1.5px solid #006FFD; border-radius: 8px; font-size: 13px; font-weight: 600; color: #006FFD; }
-.bb-submit { flex: 2; text-align: center; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; background: #006FFD; color: #fff; }
+.bb-draft { flex: 1; text-align: center; padding: 10px; border: 1.5px solid $primary; border-radius: 8px; font-size: 13px; font-weight: 600; color: $primary; }
+.bb-submit { flex: 2; text-align: center; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; background: $primary; color: #fff; }
 </style>

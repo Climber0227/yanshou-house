@@ -107,7 +107,7 @@ async function loadData(id) {
   loading.value = false
 }
 
-function goReport() { uni.navigateTo({ url: '/pages/report/report?householdId=' + household.value.id }) }
+function goReport() { uni.navigateTo({ url: '/pages/inspect/inspect?householdId=' + household.value.id }) }
 function goBack() { uni.navigateBack() }
 
 onLoad((options) => {
