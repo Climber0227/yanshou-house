@@ -112,13 +112,13 @@ onShareAppMessage(() => {
 .card-accent::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 2px; background: $primary; }
 
 .id-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: $sp-md; }
-.id-title { font-size: $fs-lg; font-weight: 600; color: $text-primary; flex: 1; margin-right: $sp-sm; }
+.id-title { font-size: $fs-lg; font-weight: 600; color: $text-primary; flex: 1; margin-right: $sp-sm; overflow: hidden; text-overflow: ellipsis; }
 
 .id-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
 .id-g-item { padding: 6px 0; border-bottom: 1px solid $border-light; display: flex; justify-content: space-between; }
 .id-g-item:nth-last-child(-n+2) { border-bottom: none; }
 .id-g-lbl { font-size: $fs-xs; color: $text-secondary; }
-.id-g-val { font-size: $fs-xs; color: $text-primary; font-weight: 500; }
+.id-g-val { font-size: $fs-xs; color: $text-primary; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 160px; }
 .id-g-val.over { color: $danger; font-weight: 600; }
 
 .tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }

@@ -63,6 +63,13 @@ page {
   }
 }
 
+// === 文本省略（多页共用）===
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 // 所有卡片添加微动效（显式列出卡片变体，避免匹配 .card-top .card-meta 等子元素）
 .card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
   animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;

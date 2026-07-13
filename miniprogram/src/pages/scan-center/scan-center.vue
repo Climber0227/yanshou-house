@@ -80,7 +80,7 @@ onShareAppMessage(() => ({ title: '扫码验房 - 分户验收', path: '/pages/s
 .sec { margin-top: 20px; }
 .sec-title { font-size: 13px; font-weight: 600; color: #8F9098; margin-bottom: 8px; display: block; }
 .recent-item { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 1px solid #E8E9F1; border-radius: 10px; padding: 12px 14px; margin-bottom: 6px; }
-.recent-name { font-size: 14px; font-weight: 500; color: #1F2024; display: block; }
+.recent-name { font-size: 14px; font-weight: 500; color: #1F2024; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 8px; }
 .recent-meta { font-size: 10px; color: #8F9098; }
 .recent-arrow { color: #C5C6CC; font-size: 16px; }
 </style>

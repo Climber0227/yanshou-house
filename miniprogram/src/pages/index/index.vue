@@ -136,7 +136,7 @@ onShareAppMessage(() => ({ title: '分户验收 - 工作台', path: '/pages/inde
 .top-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; }
 .user-pill { display: flex; align-items: center; gap: 8px; }
 .avatar { width: 30px; height: 30px; border-radius: 8px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
-.user-name { font-size: 13px; font-weight: 600; color: #1F2024; display: block; line-height: 1.3; }
+.user-name { font-size: 13px; font-weight: 600; color: #1F2024; display: block; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
 .user-role { font-size: 10px; color: #8E8E93; }
 .notif { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
 .notif-icon { font-size: 18px; }
@@ -183,8 +183,8 @@ onShareAppMessage(() => ({ title: '分户验收 - 工作台', path: '/pages/inde
 .dot-purple { background: #AF52DE; }
 .dot-green { background: #34C759; }
 .card-body { flex: 1; min-width: 0; }
-.card-title { font-size: 14px; font-weight: 600; color: #000; display: block; line-height: 1.3; }
-.card-meta { font-size: 12px; color: #8E8E93; margin-top: 2px; display: block; }
+.card-title { font-size: 14px; font-weight: 600; color: #000; display: block; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta { font-size: 12px; color: #8E8E93; margin-top: 2px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .empty { padding: 40px 0; text-align: center; color: #8E8E93; font-size: 13px; }
 </style>

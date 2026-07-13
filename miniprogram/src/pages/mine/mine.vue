@@ -74,7 +74,7 @@ function goSwitch(p) { uni.switchTab({ url: '/pages/task-list/task-list' }) }
 .mi-dot.green { background: #00A86B; }
 .mi-dot.orange { background: #E65100; }
 .mi-dot.purple { background: #7C3AED; }
-.mi-lbl { flex: 1; font-size: 14px; color: #1F2024; }
+.mi-lbl { flex: 1; font-size: 14px; color: #1F2024; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mi-arr { color: #C5C6CC; font-size: 18px; }
 .ver { text-align: center; padding: 24px 0; font-size: 11px; color: #C5C6CC; display: flex; flex-direction: column; gap: 4px; }
 </style>

@@ -114,8 +114,8 @@ function recordVoiceItem() {
 .check-hd { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
 .check-num { width: 22px; height: 22px; border-radius: 50%; background: $primary-light; color: $primary; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 .check-info { flex: 1; min-width: 0; }
-.check-name { font-size: 13px; font-weight: 600; color: $text-primary; }
-.check-desc { font-size: 10px; color: $text-secondary; margin-top: 2px; line-height: 1.4; }
+.check-name { font-size: 13px; font-weight: 600; color: $text-primary; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.check-desc { font-size: 10px; color: $text-secondary; margin-top: 2px; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; }
 .check-toggle { padding: 3px 12px; border-radius: 14px; font-size: 10px; font-weight: 600; background: #FEF2F2; color: $danger; flex-shrink: 0; white-space: nowrap; display: inline-flex; align-items: center; min-width: 48px; justify-content: center; }
 .check-toggle.pass { background: #F0FDF4; color: $success; }
 .preset-r { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }

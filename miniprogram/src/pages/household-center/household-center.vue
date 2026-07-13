@@ -261,7 +261,7 @@ onShareAppMessage(() => {
 .card-accent { background: #fff; border-radius: 12px; border: 1px solid #E8E9F1; padding: 16px; position: relative; margin-bottom: 12px; }
 .card-accent::before { content: ''; position: absolute; left: 0; top: 16px; bottom: 16px; width: 3px; border-radius: 2px; background: #006FFD; }
 .hh-top { display: flex; justify-content: space-between; align-items: flex-start; }
-.hh-name { font-size: 18px; font-weight: 700; color: #1F2024; display: block; }
+.hh-name { font-size: 18px; font-weight: 700; color: #1F2024; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 8px; }
 .hh-addr { font-size: 12px; color: #71727A; margin-top: 3px; display: block; }
 .hh-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; font-weight: 600; }
 .ht-done { background: #E8F5E9; color: #2E7D32; }
@@ -276,7 +276,7 @@ onShareAppMessage(() => {
 .act-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin: 16px 0; }
 .act-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .act-icon { width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E8E9F1; background: #F8F9FE; padding: 6px; box-sizing: border-box; }
-.act-lbl { font-size: 11px; color: #71727A; }
+.act-lbl { font-size: 11px; color: #71727A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
 /* 问题列表 */
 .sec { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px; }
@@ -289,8 +289,8 @@ onShareAppMessage(() => {
 .dot-blue { background: #006FFD; }
 .dot-purple { background: #7C3AED; }
 .dot-green { background: #00A86B; }
-.i-title { font-size: 13px; font-weight: 600; color: #1F2024; display: block; }
-.i-meta { font-size: 10px; color: #8F9098; margin-top: 2px; display: block; }
+.i-title { font-size: 13px; font-weight: 600; color: #1F2024; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.i-meta { font-size: 10px; color: #8F9098; margin-top: 2px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }
 .tag-pending { background: #FFF3E0; color: #E65100; }
 .tag-progress { background: #EAF2FF; color: #006FFD; }

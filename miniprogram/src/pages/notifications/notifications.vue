@@ -55,7 +55,7 @@ onMounted(() => { load() })
 .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: #1A56DB; margin-top: 5px; flex-shrink: 0; }
 .notif-body { flex: 1; }
 .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.notif-title { font-size: 13px; font-weight: 600; color: #1e293b; }
+.notif-title { font-size: 13px; font-weight: 600; color: #1e293b; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .notif-time { font-size: 10px; color: #94a3b8; }
 .notif-content { font-size: 12px; color: #64748b; line-height: 1.5; }
 </style>

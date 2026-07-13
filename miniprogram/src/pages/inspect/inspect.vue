@@ -491,7 +491,7 @@ onLoad(async (options) => {
 /* 公区视觉检查子项（楼梯） */
 .sub-check-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 0; border-bottom: 1px solid $border-light; }
 .sub-check-row:last-child { border-bottom: none; }
-.sub-check-label { flex: 1; font-size: 12px; color: $text-primary; min-width: 0; }
+.sub-check-label { flex: 1; font-size: 12px; color: $text-primary; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .check-hd { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
 .check-num { width: 22px; height: 22px; border-radius: 50%; background: $primary-light; color: $primary; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
 .check-info { flex: 1; min-width: 0; }
@@ -522,7 +522,7 @@ onLoad(async (options) => {
 
 /* 视频/语音按钮 */
 .media-row { display: flex; gap: 6px; margin-top: 6px; }
-.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 4px 0; border: 1px solid $border; border-radius: 4px; font-size: 10px; color: $text-secondary; position: relative; }
+.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 4px 0; border: 1px solid $border; border-radius: 4px; font-size: 10px; color: $text-secondary; position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .media-del { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: $danger; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
 .mr-label { font-size: 12px; font-weight: 600; color: $text-primary; }
 .mr-row { display: flex; gap: 6px; margin-top: 4px; }

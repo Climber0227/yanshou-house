@@ -36,8 +36,8 @@ function formatDate(iso) {
 .issue-card { padding: 12px; cursor: pointer; }
 .issue-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .issue-left { flex: 1; min-width: 0; }
-.issue-title { font-size: 14px; font-weight: 600; color: #1e293b; display: block; }
-.issue-meta { font-size: 11px; color: #64748b; margin-top: 3px; display: block; }
+.issue-title { font-size: 14px; font-weight: 600; color: #1e293b; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.issue-meta { font-size: 11px; color: #64748b; margin-top: 3px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .issue-footer { margin-top: 6px; }
 .deadline { font-size: 10px; color: #64748b; }
 .deadline.overdue { color: #DC2626; font-weight: 500; }

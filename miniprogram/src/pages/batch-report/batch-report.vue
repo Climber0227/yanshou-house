@@ -199,12 +199,12 @@ onMounted(() => { loadBuildings(); loadPresets() })
 .b-c { font-size: 10px; color: $text-hint; margin-top: 2px; }
 
 /* 户勾选 */
-.hh-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.hh-check { display: flex; align-items: center; gap: 4px; padding: 8px 6px; border: 1px solid $border; border-radius: $radius-sm; font-size: $fs-xs; }
+.hh-g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.hh-check { display: flex; align-items: center; gap: 4px; padding: 8px 6px; border: 1px solid $border; border-radius: $radius-sm; font-size: $fs-xs; overflow: hidden; }
 .hh-check.checked { border-color: $primary; background: $primary-light; }
 .check-b { width: 16px; height: 16px; border: 1.5px solid $text-placeholder; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
 .hh-check.checked .check-b { background: $primary; border-color: $primary; color: #fff; }
-.hh-info { color: $text-primary; }
+.hh-info { color: $text-primary; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* 类型 */
 /* 预设 */
