@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Skeleton v-if="loading" type="card" />
+    <view v-if="loading" class="loading-state"><text>加载中...</text></view>
     <template v-else-if="household">
       <view class="qr-card">
         <text class="qr-title">{{ household.buildingName }} {{ household.unitName }} {{ household.floor }}层 {{ household.room }}</text>
@@ -46,7 +46,6 @@
 import { ref, nextTick } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { getHouseholdDetail } from '@/api'
-import Skeleton from '@/components/Skeleton.vue'
 
 const loading = ref(true)
 const household = ref(null)
@@ -56,7 +55,7 @@ function drawQrCode(text) {
   const size = 200
   const cellSize = 4
   const padding = 10
-  const primaryColor = '#006FFD'
+  const primaryColor = '#0D3B66'
 
   ctx.setFillStyle('#ffffff')
   ctx.fillRect(0, 0, size + padding * 2, size + padding * 2)
@@ -117,7 +116,7 @@ onLoad((options) => {
 
 <style lang="scss" scoped>
 .page { padding: 0 $sp-lg 20px; display: flex; flex-direction: column; align-items: center; }
-.loading-state { padding: 80px 20px; text-align: center; }
+.loading-state { padding: 80px 20px; text-align: center; color: $text-hint; font-size: $fs-sm; }
 
 .qr-card { background: $bg-card; border: 1px solid $border; border-radius: $radius-md; padding: 24px; margin: 16px 0; width: 100%; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
 .qr-title { font-size: $fs-lg; font-weight: 700; color: $text-primary; margin-bottom: 16px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }

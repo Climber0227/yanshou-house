@@ -1,33 +1,39 @@
 <template>
 <view class="page">
-  <view class="profile">
-    <view class="avatar">{{ (user?.nickname || '?').charAt(0) }}</view>
-    <view>
-      <text class="p-name">{{ user?.nickname || '未登录' }}</text>
-      <text class="p-role" @click="switchRole">{{ user?.roleName || '' }} 切换 ›</text>
+  <view class="profile-card">
+    <view class="profile-left">
+      <view class="avatar">{{ (user?.nickname || '?').charAt(0) }}</view>
+      <view>
+        <text class="p-name">{{ user?.nickname || '未登录' }}</text>
+        <text class="p-role" @click="switchRole">角色：{{ user?.roleName || '' }} 点此切换</text>
+      </view>
     </view>
   </view>
 
-  <view class="menu">
+  <view class="menu-card">
     <view class="menu-item" @click="goNotif">
-      <view class="mi-dot blue"></view>
-      <text class="mi-lbl">通知消息</text><text class="mi-arr">›</text>
+      <view class="mi-icon"><view class="mi-dot blue"></view></view>
+      <text class="mi-lbl">通知消息</text>
+      <text class="mi-arr">›</text>
     </view>
     <view class="menu-item" @click="goSelect">
-      <view class="mi-dot green"></view>
-      <text class="mi-lbl">选户操作</text><text class="mi-arr">›</text>
+      <view class="mi-icon"><view class="mi-dot green"></view></view>
+      <text class="mi-lbl">选户操作</text>
+      <text class="mi-arr">›</text>
     </view>
     <view class="menu-item" @click="goBatch">
-      <view class="mi-dot orange"></view>
-      <text class="mi-lbl">批量上报</text><text class="mi-arr">›</text>
+      <view class="mi-icon"><view class="mi-dot orange"></view></view>
+      <text class="mi-lbl">批量上报</text>
+      <text class="mi-arr">›</text>
     </view>
     <view class="menu-item" @click="goSwitch('task-list')" style="border:none;">
-      <view class="mi-dot purple"></view>
-      <text class="mi-lbl">我的任务</text><text class="mi-arr">›</text>
+      <view class="mi-icon"><view class="mi-dot purple"></view></view>
+      <text class="mi-lbl">我的任务</text>
+      <text class="mi-arr">›</text>
     </view>
   </view>
 
-  <view class="ver">
+  <view class="version">
     <text>分户验收 v1.0.0</text>
     <text>数据模式：Mock</text>
   </view>
@@ -62,19 +68,26 @@ function goSwitch(p) { uni.switchTab({ url: '/pages/task-list/task-list' }) }
 </script>
 
 <style scoped>
-.page { padding: 0 16px 20px; }
-.profile { display: flex; align-items: center; gap: 14px; padding: 20px 16px; margin: 16px 0; background: #fff; border: 1px solid #E8E9F1; border-radius: 14px; }
-.avatar { width: 48px; height: 48px; border-radius: 14px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; }
-.p-name { font-size: 16px; font-weight: 600; color: #1F2024; display: block; }
-.p-role { font-size: 12px; color: #006FFD; margin-top: 4px; display: inline-block; padding: 2px 8px; border: 1px dashed #006FFD; border-radius: 4px; }
-.menu { background: #fff; border: 1px solid #E8E9F1; border-radius: 14px; overflow: hidden; }
-.menu-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #F0F1F5; }
-.mi-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-.mi-dot.blue { background: #006FFD; }
-.mi-dot.green { background: #00A86B; }
-.mi-dot.orange { background: #E65100; }
+.page { padding: 0 16px 20px; background: #f5f6f8; min-height: 100vh; }
+
+.profile-card { display: flex; justify-content: space-between; align-items: center; padding: 18px 16px; margin: 16px 0; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; }
+.profile-left { display: flex; align-items: center; gap: 14px; }
+.avatar { width: 48px; height: 48px; border-radius: 8px; background: #0D3B66; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; }
+.p-name { font-size: 16px; font-weight: 600; color: #333; display: block; }
+.p-role { font-size: 12px; color: #0D3B66; margin-top: 4px; display: inline-block; padding: 2px 8px; border: 1px dashed #0D3B66; border-radius: 4px; }
+
+.menu-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+.menu-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f0f0f0; }
+.menu-item:active { background: #f5f7fa; }
+.mi-icon { width: 24px; flex-shrink: 0; display: flex; align-items: center; }
+.mi-dot { width: 8px; height: 8px; border-radius: 50%; }
+.mi-dot.blue { background: #0D3B66; }
+.mi-dot.green { background: #2E7D32; }
+.mi-dot.orange { background: #CC7B00; }
 .mi-dot.purple { background: #7C3AED; }
-.mi-lbl { flex: 1; font-size: 14px; color: #1F2024; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mi-arr { color: #C5C6CC; font-size: 18px; }
-.ver { text-align: center; padding: 24px 0; font-size: 11px; color: #C5C6CC; display: flex; flex-direction: column; gap: 4px; }
+.mi-lbl { flex: 1; font-size: 14px; color: #333; margin-left: 8px; }
+.mi-arr { color: #ccc; font-size: 16px; }
+
+.version { text-align: center; padding: 24px 0; display: flex; flex-direction: column; gap: 4px; }
+.version text { font-size: 11px; color: #bbb; }
 </style>

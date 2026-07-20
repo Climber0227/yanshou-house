@@ -9,7 +9,7 @@
     </view>
   </view>
 
-  <Skeleton v-if="loading" type="card" :count="4" />
+  <view v-if="loading" class="page-loading"><text>加载中...</text></view>
   <template v-else>
     <view v-for="i in list" :key="i.id" class="card" @click="goDetail(i)">
       <view class="card-top">
@@ -36,7 +36,6 @@ import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getRectifyTasks, getPendingReviews } from '@/api'
-import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const role = computed(() => store.user?.role || '')
@@ -81,14 +80,15 @@ onShow(() => {
 </script>
 
 <style scoped>
-.page { padding: 0 16px 20px; }
+.page { padding: 0 $sp-lg 20px; }
 .card { padding: 14px; margin-bottom: 8px; }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .card-info { flex: 1; min-width: 0; }
-.card-title { font-size: 14px; font-weight: 600; color: #1F2024; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-meta { font-size: 11px; color: #8F9098; margin-top: 3px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-foot { display: flex; gap: 16px; margin-top: 8px; }
-.card-foot-text { font-size: 10px; color: #8F9098; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-foot-text.over { color: #ED3241; font-weight: 500; }
-.empty { padding: 60px 0; text-align: center; color: #8F9098; font-size: 13px; }
+.card-title { font-size: $fs-md; font-weight: 600; color: $text-primary; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta { font-size: 11px; color: $text-hint; margin-top: 3px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-foot { display: flex; gap: $sp-lg; margin-top: $sp-sm; }
+.card-foot-text { font-size: 10px; color: $text-hint; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-foot-text.over { color: $danger; font-weight: 500; }
+.page-loading { padding: 60px 0; text-align: center; color: $text-hint; font-size: $fs-sm; }
+.empty { padding: 60px 0; text-align: center; color: $text-hint; font-size: 13px; }
 </style>

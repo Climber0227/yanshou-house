@@ -20,8 +20,8 @@
       </view>
     </view>
 
-    <!-- 电子签名（仅通过时显示） -->
-    <view v-if="result === 'pass'" class="form-group">
+    <!-- 电子签名 - 始终渲染，通过隐藏控制 -->
+    <view class="form-group" :style="result !== 'pass' ? 'display:none;' : ''">
       <view class="form-label-row">
         <text class="form-label">电子签名 <text class="req">*</text></text>
         <text class="form-hint" @click="clearSignature">清除重签</text>
@@ -34,8 +34,8 @@
           @touchmove="onTouchMove"
           @touchend="onTouchEnd"
         />
-        <text v-if="!signatureData" class="signature-hint">请在上方手写签名</text>
-        <image v-else :src="signatureData" mode="aspectFit" class="signature-preview" />
+        <text v-if="!hasDrawn" class="signature-hint">请在上方手写签名</text>
+        <image v-else :src="signaturePath" mode="aspectFit" class="signature-preview" />
       </view>
     </view>
 
@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { reviewIssue } from '@/api'
 
@@ -61,85 +61,82 @@ const issueId = ref('')
 const result = ref('pass')
 const opinion = ref('')
 
-// 电子签名
-const signatureData = ref('')
-const ctx = ref(null)
+const hasDrawn = ref(false)
+const signaturePath = ref('')
+let canvasCtx = null
 let isDrawing = false
-let lastPoint = { x: 0, y: 0 }
 
 function initCanvas() {
-  // 延迟初始化确保 Canvas 已渲染
-  setTimeout(() => {
-    ctx.value = uni.createCanvasContext('signatureCanvas')
-    ctx.value.setStrokeStyle('#1F2024')
-    ctx.value.setLineWidth(3)
-    ctx.value.setLineCap('round')
-    ctx.value.setLineJoin('round')
-  }, 200)
+  nextTick(() => {
+    canvasCtx = uni.createCanvasContext('signatureCanvas')
+    canvasCtx.setStrokeStyle('#333')
+    canvasCtx.setLineWidth(3)
+    canvasCtx.setLineCap('round')
+    canvasCtx.setLineJoin('round')
+  })
 }
 
-function getPoint(e) {
+function getCanvasPos(e) {
   const touch = e.touches[0]
-  // 获取 Canvas 在页面中的位置
-  const query = uni.createSelectorQuery().in(this)
+  const query = uni.createSelectorQuery()
   return new Promise((resolve) => {
     query.select('.signature-canvas').boundingClientRect(rect => {
+      if (!rect) { resolve({ x: 0, y: 0 }); return }
       resolve({
-        x: touch.clientX - (rect?.left || 0),
-        y: touch.clientY - (rect?.top || 0)
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
       })
     }).exec()
   })
 }
 
 async function onTouchStart(e) {
+  if (!canvasCtx) return
   isDrawing = true
-  const point = await getPoint(e)
-  lastPoint = point
-  ctx.value.beginPath()
-  ctx.value.moveTo(point.x, point.y)
+  const pos = await getCanvasPos(e)
+  canvasCtx.beginPath()
+  canvasCtx.moveTo(pos.x, pos.y)
 }
 
 async function onTouchMove(e) {
-  if (!isDrawing) return
-  const point = await getPoint(e)
-  ctx.value.lineTo(point.x, point.y)
-  ctx.value.stroke()
-  ctx.value.draw(true)
-  lastPoint = point
+  if (!isDrawing || !canvasCtx) return
+  const pos = await getCanvasPos(e)
+  canvasCtx.lineTo(pos.x, pos.y)
+  canvasCtx.stroke()
+  canvasCtx.draw(true)
 }
 
 function onTouchEnd() {
+  if (!isDrawing) return
   isDrawing = false
-  // 导出签名
+  hasDrawn.value = true
   setTimeout(() => {
     uni.canvasToTempFilePath({
       canvasId: 'signatureCanvas',
-      success: (res) => {
-        signatureData.value = res.tempFilePath
-      },
-      fail: () => {
-        // 签名太短时不处理
-      }
+      success: (res) => { signaturePath.value = res.tempFilePath },
+      fail: () => {}
     })
   }, 100)
 }
 
 function clearSignature() {
-  signatureData.value = ''
-  ctx.value.clearRect(0, 0, 300, 150)
-  ctx.value.draw()
+  hasDrawn.value = false
+  signaturePath.value = ''
+  if (canvasCtx) {
+    canvasCtx.clearRect(0, 0, 300, 150)
+    canvasCtx.draw()
+  }
 }
 
 async function submitReview() {
-  if (result.value === 'pass' && !signatureData.value) {
+  if (result.value === 'pass' && !hasDrawn.value) {
     uni.showToast({ title: '请手写签名确认', icon: 'none' })
     return
   }
-  const res = await reviewIssue(issueId.value, result.value, opinion.value, signatureData.value)
+  const sig = result.value === 'pass' ? signaturePath.value : ''
+  const res = await reviewIssue(issueId.value, result.value, opinion.value, sig)
   if (res.code === 0) {
-    const msg = result.value === 'pass' ? '复查通过，已闭环' : '已退回整改'
-    uni.showToast({ title: msg, icon: 'success' })
+    uni.showToast({ title: result.value === 'pass' ? '复查通过，已闭环' : '已退回整改', icon: 'success' })
     setTimeout(() => uni.navigateBack(), 1000)
   }
 }

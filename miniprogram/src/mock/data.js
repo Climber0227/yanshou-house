@@ -119,7 +119,8 @@ for (let b = 1; b <= 11; b++) {
           pendingCount: 0,
           closedCount: 0,
           acceptanceStatus: 'pending',
-          acceptanceStatusName: '验收中'
+          acceptanceStatusName: '验收中',
+          inspectionStatus: { visual: 'pending', measure: 'pending', public: 'pending' }
         })
       }
     }

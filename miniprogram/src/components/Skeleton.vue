@@ -46,9 +46,9 @@ const props = defineProps({
 </script>
 
 <style lang="scss" scoped>
-.skt { width: 100%; }
+.skt { width: 100%; box-sizing: border-box; }
 
-// 网格容器（统计用）
+// 网格容器
 .skt-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -57,9 +57,10 @@ const props = defineProps({
 
 .skt-block {
   background: rgba(255,255,255,0.85);
-  border-radius: 14px;
+  border-radius: $radius-md;
   padding: 14px 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: $shadow-sm;
+  box-sizing: border-box;
 }
 
 // 列表卡片骨架行
@@ -68,10 +69,11 @@ const props = defineProps({
   align-items: center;
   gap: 12px;
   background: rgba(255,255,255,0.85);
-  border-radius: 14px;
+  border-radius: $radius-md;
   padding: 14px 16px;
   margin-bottom: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: $shadow-sm;
+  box-sizing: border-box;
   animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 

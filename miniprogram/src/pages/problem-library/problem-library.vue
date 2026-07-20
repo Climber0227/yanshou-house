@@ -9,6 +9,7 @@
         <view v-for="b in buildings" :key="b.id"
           class="b-chip" :class="{ active: selB === b.id }"
           @click="selB = b.id; load()">
+          <text class="b-chip-icon">楼</text>
           <text class="b-name">{{ b.name }}</text>
         </view>
       </scroll-view>
@@ -18,7 +19,7 @@
       <text>共 {{ total }} 项问题</text>
     </view>
 
-    <Skeleton v-if="loading" type="card" :count="4" />
+    <view v-if="loading" class="page-loading"><text>加载中...</text></view>
     <template v-else>
       <view v-for="i in list" :key="i.id" class="card" @click="goDetail(i)">
         <view class="card-top">
@@ -43,7 +44,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getBuildings, getAllIssues } from '@/api'
-import Skeleton from '@/components/Skeleton.vue'
 
 const buildings = ref([])
 const list = ref([])
@@ -74,30 +74,33 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.page { padding: 0 16px 20px; }
-.filter-bar { padding: 8px 0; }
+.page { padding: 0 $sp-lg 20px; }
+.filter-bar { padding: $sp-sm 0; }
 .b-scroll { white-space: nowrap; padding-bottom: 4px; }
 .b-scroll::-webkit-scrollbar { display: none; }
-.b-chip { display: inline-flex; flex-direction: column; align-items: center; padding: 8px 16px; border: 1px solid #E8E9F1; border-radius: 10px; margin-right: 8px; background: #fff; }
-.b-chip.active { border-color: #006FFD; background: #EAF2FF; }
-.b-chip.active .b-name { color: #006FFD; }
-.b-name { font-size: 14px; font-weight: 600; color: #1F2024; }
+.page-loading { padding: 60px 0; text-align: center; color: $text-hint; font-size: $fs-sm; }
+.b-chip { display: inline-flex; align-items: center; gap: 4px; padding: $sp-sm $sp-lg; border: 1px solid $border; border-radius: $radius-sm; margin-right: $sp-sm; background: #fff; }
+.b-chip:active { border-color: $primary; }
+.b-chip.active { border-color: $primary; background: $primary-light; }
+.b-chip.active .b-name { color: $primary; }
+.b-chip-icon { font-size: 12px; font-weight: 600; }
+.b-name { font-size: $fs-md; font-weight: 600; color: $text-primary; white-space: nowrap; }
 
-.stat-bar { font-size: 12px; color: #8F9098; padding: 8px 0 12px; }
+.stat-bar { font-size: $fs-xs; color: $text-hint; padding: $sp-sm 0 $sp-md; }
 
-.card { padding: 14px; margin-bottom: 8px; }
+.card { padding: $sp-lg; margin-bottom: $sp-sm; }
 .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
 .card-info { flex: 1; min-width: 0; }
-.card-title { font-size: 14px; font-weight: 600; color: #1F2024; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-meta { font-size: 11px; color: #8F9098; margin-top: 3px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-foot { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
-.card-foot-text { font-size: 10px; color: #8F9098; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
-.card-foot-text.over { color: #ED3241; font-weight: 500; }
+.card-title { font-size: $fs-md; font-weight: 600; color: $text-primary; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta { font-size: 11px; color: $text-hint; margin-top: 3px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-foot { display: flex; gap: $sp-lg; margin-top: $sp-sm; flex-wrap: wrap; }
+.card-foot-text { font-size: 10px; color: $text-hint; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.card-foot-text.over { color: $danger; font-weight: 500; }
 
 .tag { padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; }
 .tag-pending { background: #FFF3E0; color: #E65100; }
-.tag-progress { background: #EAF2FF; color: #006FFD; }
+.tag-progress { background: $primary-light; color: $primary; }
 .tag-review { background: #F3E8FF; color: #7C3AED; }
 .tag-closed { background: #E8F5E9; color: #2E7D32; }
-.empty { padding: 60px 0; text-align: center; color: #8F9098; font-size: 13px; }
+.empty { padding: 60px 0; text-align: center; color: $text-hint; font-size: 13px; }
 </style>

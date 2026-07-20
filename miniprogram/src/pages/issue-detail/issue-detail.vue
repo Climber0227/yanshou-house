@@ -1,6 +1,6 @@
 <template>
   <view class="page">
-    <Skeleton v-if="loading" type="detail" />
+    <view v-if="loading" class="page-loading"><text>加载中...</text></view>
     <template v-else-if="issue">
       <!-- 问题基本信息 -->
       <view class="card-accent">
@@ -54,7 +54,6 @@ import { ref, computed } from 'vue'
 import { onLoad, onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getIssueDetail, getIssueTimeline, startRectify as startApi } from '@/api'
-import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const userRole = computed(() => store.user?.role || '')
@@ -129,6 +128,7 @@ onShareAppMessage(() => {
 
 .action-card { background: $primary-light; border: 1px solid $primary; border-radius: $radius-md; padding: 14px; text-align: center; margin: $sp-md 0; }
 .action-card.review { background: #F0FDF4; border-color: $success; }
+.action-card:active { opacity: 0.85; }
 .action-card-text { font-size: $fs-md; font-weight: 600; color: $primary; }
 
 .sec { display: flex; justify-content: space-between; align-items: center; margin: $sp-lg 0 $sp-sm; }
@@ -142,5 +142,6 @@ onShareAppMessage(() => {
 .tl-meta { font-size: $fs-xs; color: $text-secondary; }
 .tl-time { font-size: 10px; color: $text-hint; }
 
+.page-loading { padding: 60px 0; text-align: center; color: $text-hint; font-size: $fs-sm; }
 .empty { padding: 60px 0; text-align: center; color: $text-hint; font-size: $fs-sm; }
 </style>

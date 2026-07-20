@@ -12,7 +12,8 @@
   <!-- 观感 / 公区 visual 项 -->
   <view v-if="isVisual">
     <InspectItem v-for="(item, idx) in visualItems" :key="item.id"
-      :item="item" :index="idx + 1" @addPhoto="onAddPhoto" />
+      :item="item" :index="idx + 1" :locked="lockedIds.has(item.id)"
+      @addPhoto="onAddPhoto" @confirm="handleVisualConfirm" @unlock="handleVisualUnlock" />
   </view>
 
   <!-- 实测 -->
@@ -157,18 +158,18 @@
 
   <!-- 底部栏 -->
   <view class="bb">
-    <view class="bb-status">
-      <text>已完成 {{ doneCount }} 项</text>
-      <picker mode="date" :value="deadline" @change="e => deadline = e.detail.value" style="margin-left:8px;">
-        <view class="bb-deadline">{{ deadline ? deadline : '设置整改期限' }}</view>
-      </picker>
+    <view class="bb-summary">
+      <text class="bb-summary-text">问题列表：<text class="bb-count">{{ issueList.length }}</text> 项</text>
+      <text v-if="issueList.length > 0" class="bb-clear-all" @click="clearAllIssues">清空</text>
     </view>
+    <!-- 整改人（实测/公区共用） -->
     <view class="bb-rectifier">
-      <RectifierPicker v-model="rectifier" />
+      <text class="bb-rectifier-label">整改人 <text class="req">*</text></text>
+      <RectifierPicker v-model="bottomRectifier" />
     </view>
     <view class="bb-btns">
-      <view class="bb-draft" @click="saveDraftLocal">暂存</view>
-      <view class="bb-submit" @click="submitInspection">{{ submitting ? '提交中...' : '提交检查' }}</view>
+      <view class="bb-draft" @click="markAllPassed">一键全部合格</view>
+      <view class="bb-submit" @click="handleSubmitClick">{{ submitting ? '提交中...' : '提交本户验收' + (issueList.length > 0 ? '('+issueList.length+'项)' : '') }}</view>
     </view>
   </view>
 </scroll-view>
@@ -180,7 +181,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { INSPECTION_FORMS } from '@/config/inspection-forms'
 import { saveDraft, loadDraft, removeDraft, enqueue } from '@/utils/storage'
 import { compressImages } from '@/utils/media'
-import { reportIssue, getEstimatedValues } from '@/api'
+import { reportIssue, getEstimatedValues, getIssuePresets, acceptHousehold } from '@/api'
 import InspectItem from '@/components/InspectItem.vue'
 import RectifierPicker from '@/components/RectifierPicker.vue'
 
@@ -189,8 +190,10 @@ const activeType = ref('visual')
 const householdId = ref('')
 const submitting = ref(false)
 const deadline = ref('')
-const rectifier = ref({ name: '', phone: '' })
 const visualItems = ref([])
+const issueList = ref([])       // 确认添加的问题汇总
+const lockedIds = ref(new Set()) // 已确认的 visual item ID 集合
+const bottomRectifier = ref({ name: '', phone: '' }) // 底部栏公共整改人（实测/公区）
 const md = reactive({})  // measure data
 const sd = reactive({})  // sub-item data
 const pm = reactive({})  // public measure data
@@ -206,13 +209,14 @@ const isVisual = computed(() => activeType.value === 'visual')
 const measureItems = computed(() => INSPECTION_FORMS.measure?.items || [])
 const publicMeasureItems = computed(() => (INSPECTION_FORMS.public?.items || []).filter(i => i.measures?.length))
 const allPublicItems = computed(() => {
+  const pp = publicPresets.value
   return (INSPECTION_FORMS.public?.items || []).map((item, idx) => ({
     ...item,
     seq: idx + 1,
     _hasIssue: item._hasIssue || false,
     _desc: item._desc || '',
     _photos: item._photos || [],
-    _presets: item.presets || []
+    _presets: pp[item.id] || item.presets || []
   }))
 })
 const doneCount = computed(() => {
@@ -221,13 +225,37 @@ const doneCount = computed(() => {
   return Object.keys(pubVisualState).length + Object.keys(pm).length
 })
 
-function initVisual() {
+async function loadPresetsForType(type, itemKey = 'id') {
+  const r = await getIssuePresets(type)
+  if (r.code !== 0) return {}
+  const presetList = r.data.list || []
+  // 按分类聚合预设：{ 墙面: ['墙面空鼓', '墙面开裂'], 地面: [...] }
+  const grouped = {}
+  for (const p of presetList) {
+    const cat = p.category || ''
+    if (!grouped[cat]) grouped[cat] = []
+    grouped[cat].push(p.description || '')
+  }
+  return grouped
+}
+
+const publicPresets = ref({}) // { itemId: ['预设1', '预设2'] }
+
+async function initVisual() {
   visualItems.value = INSPECTION_FORMS.visual.items.map(it => ({
     ...it, _hasIssue: false, _desc: '', _photos: [], _presets: [...(it.presets || [])]
   }))
+  // 尝试从后端加载预设，覆盖默认值
+  const grouped = await loadPresetsForType('visual')
+  if (Object.keys(grouped).length > 0) {
+    visualItems.value = visualItems.value.map(it => ({
+      ...it,
+      _presets: grouped[it.name] || it._presets
+    }))
+  }
 }
 
-function initPublic() {
+async function initPublic() {
   // 清空旧状态
   Object.keys(pubVisualState).forEach(k => delete pubVisualState[k])
   Object.keys(pm).forEach(k => delete pm[k])
@@ -236,6 +264,16 @@ function initPublic() {
   Object.keys(pubCheckPhotos).forEach(k => delete pubCheckPhotos[k])
   Object.keys(pubCheckVideo).forEach(k => delete pubCheckVideo[k])
   Object.keys(pubCheckVoice).forEach(k => delete pubCheckVoice[k])
+  // 从 API 加载公共区域预设（覆盖默认值）
+  const grouped = await loadPresetsForType('public')
+  if (Object.keys(grouped).length > 0) {
+    const pp = {}
+    for (const item of (INSPECTION_FORMS.public?.items || [])) {
+      const name = item.name || ''
+      pp[item.id] = grouped[name] || item.presets || []
+    }
+    publicPresets.value = pp
+  }
 }
 
 function initPubMeasures() {
@@ -249,20 +287,23 @@ function initPubMeasures() {
   }
 }
 
-function switchType(key) {
-  // 保存草稿（含 deadline）
-  const tabDraft = activeType.value === 'visual' ? { items: visualItems.value } : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) } : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
-  saveDraft(householdId.value, activeType.value, { ...tabDraft, deadline: deadline.value, rectifierName: rectifier.value.name, rectifierPhone: rectifier.value.phone })
+async function switchType(key) {
+  // 保存草稿（含 deadline + issueList）
+  const tabDraft = activeType.value === 'visual' ? { items: visualItems.value, lockedIds: [...lockedIds.value] }
+    : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) }
+    : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
+  saveDraft(householdId.value, activeType.value, { ...tabDraft, deadline: deadline.value, issueList: JSON.parse(JSON.stringify(issueList.value)) })
 
   activeType.value = key
-  if (key === 'visual') initVisual()
-  if (key === 'public') { initPublic(); initPubMeasures() }
+  if (key === 'visual') await initVisual()
+  if (key === 'public') { await initPublic(); initPubMeasures() }
 
-  // 恢复草稿（含 deadline + rectifier）
+  // 恢复草稿（含 deadline + issueList）
   const saved = loadDraft(householdId.value, key)
   if (saved) {
     if (saved.deadline) deadline.value = saved.deadline
-    if (saved.rectifierName) rectifier.value = { name: saved.rectifierName, phone: saved.rectifierPhone || '' }
+    if (saved.issueList) issueList.value = saved.issueList
+    if (saved.lockedIds) lockedIds.value = new Set(saved.lockedIds)
     if (key === 'visual' && saved.items) visualItems.value = saved.items
     if (key === 'public') {
       if (saved.pvs) Object.assign(pubVisualState, JSON.parse(JSON.stringify(saved.pvs)))
@@ -275,6 +316,68 @@ function switchType(key) {
     }
     if (key === 'measure') { Object.assign(md, saved.md || {}); Object.assign(sd, saved.sd || {}) }
   }
+}
+
+// --- 问题列表管理 ---
+function handleVisualConfirm(item) {
+  // 检查是否已在列表中
+  if (issueList.value.find(i => i._itemId === item.id)) {
+    uni.showToast({ title: '该问题已添加', icon: 'none' }); return
+  }
+  const issue = {
+    _itemId: item.id,
+    householdId: householdId.value,
+    type: 'visual',
+    category: item.name,
+    description: item._desc,
+    photos: item._photos || [],
+    video: item._video || '',
+    voice: item._voice || '',
+    deadline: deadline.value,
+    rectifierName: item.rectifierName,
+    rectifierPhone: item.rectifierPhone,
+    rectifierId: item.rectifierId
+  }
+  issueList.value.push(issue)
+  lockedIds.value.add(item.id)
+  uni.showToast({ title: '已添加到问题列表', icon: 'success', duration: 1200 })
+}
+
+function handleVisualUnlock(item) {
+  lockedIds.value.delete(item.id)
+  const idx = issueList.value.findIndex(i => i._itemId === item.id)
+  if (idx >= 0) issueList.value.splice(idx, 1)
+}
+
+function clearAllIssues() {
+  uni.showModal({
+    title: '清空确认', content: '确认清空所有已添加的问题？',
+    success: (res) => {
+      if (!res.confirm) return
+      issueList.value = []
+      lockedIds.value.clear()
+      uni.showToast({ title: '已清空', icon: 'none' })
+    }
+  })
+}
+
+// --- 一键全部合格 ---
+function markAllPassed() {
+  const undecided = visualItems.value.filter(i => !i._hasIssue)
+  if (undecided.length === 0) {
+    uni.showToast({ title: '所有项已判定', icon: 'none' }); return
+  }
+  uni.showModal({
+    title: '一键全部合格',
+    content: `将本 TAB 中 ${undecided.length} 项未判定项标记为合格？`,
+    success: (res) => {
+      if (!res.confirm) return
+      for (const item of undecided) {
+        item._hasIssue = false; item._desc = ''; item._photos = []
+      }
+      uni.showToast({ title: '已全部标为合格', icon: 'success' })
+    }
+  })
 }
 
 function onAddPhoto(item) {
@@ -372,34 +475,81 @@ function roomLabel(r) {
 }
 
 function saveDraftLocal() {
-  const tabData = activeType.value === 'visual' ? visualItems.value : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) } : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
-  saveDraft(householdId.value, activeType.value, { ...tabData, deadline: deadline.value, rectifierName: rectifier.value.name, rectifierPhone: rectifier.value.phone })
+  const tabData = activeType.value === 'visual' ? { items: visualItems.value, lockedIds: [...lockedIds.value] }
+    : activeType.value === 'public' ? { pvs: JSON.parse(JSON.stringify(pubVisualState)), pm: JSON.parse(JSON.stringify(pm)), pcd: JSON.parse(JSON.stringify(pubCheckData)), pcs: JSON.parse(JSON.stringify(pubCheckDesc)), pcp: JSON.parse(JSON.stringify(pubCheckPhotos)), pcv: JSON.parse(JSON.stringify(pubCheckVideo)), pcw: JSON.parse(JSON.stringify(pubCheckVoice)) }
+    : { md: JSON.parse(JSON.stringify(md)), sd: JSON.parse(JSON.stringify(sd)) }
+  saveDraft(householdId.value, activeType.value, { ...tabData, deadline: deadline.value, issueList: JSON.parse(JSON.stringify(issueList.value)) })
   uni.showToast({ title: '已保存', icon: 'none', duration: 1000 })
 }
 
-async function submitInspection() {
+// 提交入口（含二次确认）
+function handleSubmitClick() {
   if (submitting.value) return
-  if (!rectifier.value.name) { uni.showToast({ title: '请选择整改人', icon: 'none' }); submitting.value = false; return }
+  if (issueList.value.length > 0) {
+    const names = issueList.value.map(i => i.rectifierName || '未指定').join('、')
+    uni.showModal({
+      title: '确认提交',
+      content: `将提交 ${issueList.value.length} 项问题，整改通知将发送给：${names}`,
+      success: (res) => { if (res.confirm) doSubmit() }
+    })
+  } else {
+    uni.showModal({
+      title: '确认提交',
+      content: '当前 TAB 所有检查项均合格，确认提交无问题？',
+      success: (res) => { if (res.confirm) doSubmit() }
+    })
+  }
+}
+
+async function doSubmit() {
+  // 校验整改人（实测/公区必须有公共整改人）
+  const autoIssues = gatherAutoIssues()
+  const all = [...issueList.value, ...autoIssues]
+  const noRectifier = all.filter(i => !i.rectifierName)
+  if (noRectifier.length > 0) {
+    submitting.value = false
+    uni.showToast({ title: '请为所有问题指定整改人', icon: 'none' })
+    return
+  }
+
   submitting.value = true
+  // 自动检测到的问题也加入列表
+  if (autoIssues.length > 0) {
+    for (const ai of autoIssues) issueList.value.push(ai)
+  }
 
-  const rName = rectifier.value.name
-  const rPhone = rectifier.value.phone
-  const issueList = []
+  const netOk = await new Promise(r => { uni.getNetworkType({ success: (res) => r(res.networkType !== 'none'), fail: () => r(true) }) })
 
-  if (activeType.value === 'visual') {
-    for (const item of visualItems.value) {
-      if (item._hasIssue && item._desc) {
-        issueList.push({ householdId: householdId.value, type: 'visual', category: item.name, description: item._desc, photos: item._photos || [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
-      }
-    }
-  } else if (activeType.value === 'measure') {
+  if (!netOk) {
+    enqueue({ householdId: householdId.value, type: activeType.value, issues: all })
+    uni.showToast({ title: '已暂存，联网后上传', icon: 'none' })
+    removeDraft(householdId.value, activeType.value)
+    issueList.value = []; lockedIds.value.clear()
+  } else {
+    for (const issue of all) { await reportIssue(issue) }
+    await acceptHousehold(householdId.value, activeType.value, all.length > 0 ? 'has_issues' : 'passed')
+    uni.showToast({ title: all.length > 0 ? `已提交 ${all.length} 项问题` : '全部合格', icon: 'success' })
+    removeDraft(householdId.value, activeType.value)
+    issueList.value = []; lockedIds.value.clear()
+  }
+
+  submitting.value = false
+  if (netOk) setTimeout(() => uni.navigateBack(), 1500)
+}
+
+// 实测和公区自动检测
+function gatherAutoIssues() {
+  const out = []
+  if (activeType.value === 'measure') {
     const items = INSPECTION_FORMS.measure.items
     for (const item of items) {
       if (item.perRoom) {
         for (const room of item.rooms) {
           const v = md[`${item.id}_${room}`]
           if (v && parseInt(v) > 5) {
-            issueList.push({ householdId: householdId.value, type: 'measure', category: item.name, description: `${roomLabel(room)}实测${v}mm偏差超限`, photos: [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
+            out.push({ householdId: householdId.value, type: 'measure', category: item.name,
+              description: `${roomLabel(room)}实测${v}mm偏差超限`, photos: [], deadline: deadline.value,
+              rectifierName: bottomRectifier.value.name, rectifierPhone: bottomRectifier.value.phone })
           }
         }
       }
@@ -407,62 +557,51 @@ async function submitInspection() {
   } else if (activeType.value === 'public') {
     const pitems = INSPECTION_FORMS.public.items
     for (const item of pitems) {
-      // 实测项
       if (item.measures) {
         for (const m of item.measures) {
-          const v = pm[m.key]
-          const ev = estimatedValues[m.key]
+          const v = pm[m.key]; const ev = estimatedValues[m.key]
           if (v && ev && Math.abs(parseInt(v) - ev) > 5) {
-            issueList.push({ householdId: householdId.value, type: 'public', category: item.name, description: `${m.label}实测${v}mm偏差超限`, photos: [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
+            out.push({ householdId: householdId.value, type: 'public', category: item.name,
+              description: `${m.label}实测${v}mm偏差超限`, photos: [], deadline: deadline.value,
+              rectifierName: bottomRectifier.value.name, rectifierPhone: bottomRectifier.value.phone })
           }
         }
       }
-      // 视觉检查子项（楼梯）
       if (item.visualChecks) {
         for (const vc of item.visualChecks) {
           if (pubCheckData[vc.key] && pubCheckDesc[vc.key]) {
-            issueList.push({ householdId: householdId.value, type: 'public', category: item.name, description: `${vc.label}: ${pubCheckDesc[vc.key]}`, photos: pubCheckPhotos[vc.key] || [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
+            out.push({ householdId: householdId.value, type: 'public', category: item.name,
+              description: `${vc.label}: ${pubCheckDesc[vc.key]}`, photos: pubCheckPhotos[vc.key] || [],
+              deadline: deadline.value, rectifierName: bottomRectifier.value.name, rectifierPhone: bottomRectifier.value.phone })
           }
         }
       }
-      // 纯视觉项
       if (!item.measures && !item.visualChecks) {
         const vs = pubVisualState[item.id]
         if (vs && vs._hasIssue && vs._desc) {
-          issueList.push({ householdId: householdId.value, type: 'public', category: item.name, description: vs._desc, photos: vs._photos || [], remark: '', deadline: deadline.value, rectifierName: rName, rectifierPhone: rPhone })
+          out.push({ householdId: householdId.value, type: 'public', category: item.name,
+            description: vs._desc, photos: vs._photos || [],
+            deadline: deadline.value, rectifierName: bottomRectifier.value.name, rectifierPhone: bottomRectifier.value.phone })
         }
       }
     }
   }
-
-  // 网络检测
-  const netOk = await new Promise(r => { uni.getNetworkType({ success: (res) => r(res.networkType !== 'none'), fail: () => r(true) }) })
-
-  if (!netOk) {
-    enqueue({ householdId: householdId.value, type: activeType.value, issues: issueList })
-    uni.showToast({ title: '已暂存，联网后上传', icon: 'none' })
-    removeDraft(householdId.value, activeType.value)
-  } else {
-    if (issueList.length > 0) {
-      // 并发提交
-      for (const issue of issueList) { await reportIssue(issue) }
-    }
-    removeDraft(householdId.value, activeType.value)
-    const msg = issueList.length > 0 ? `发现 ${issueList.length} 项问题` : '全部合格'
-    uni.showToast({ title: msg, icon: 'success' })
-    setTimeout(() => uni.navigateBack(), 1500)
-  }
-
-  submitting.value = false
+  return out
 }
 
 onLoad(async (options) => {
   householdId.value = options?.householdId || ''
-  initVisual()
+  const targetTab = options?.tab || ''
+  await initVisual()
+  // 支持从 household-center 传入 tab 参数，直接切换到对应 TAB
+  if (targetTab && targetTab !== 'visual') {
+    await switchType(targetTab)
+  }
   const saved = loadDraft(householdId.value, 'visual')
   if (saved) {
     if (saved.deadline) deadline.value = saved.deadline
-    if (saved.rectifierName) rectifier.value = { name: saved.rectifierName, phone: saved.rectifierPhone || '' }
+    if (saved.issueList) issueList.value = saved.issueList
+    if (saved.lockedIds) lockedIds.value = new Set(saved.lockedIds)
     if (saved.items) visualItems.value = saved.items
   }
   // 加载推算值（从后端/Mock）
@@ -507,19 +646,6 @@ onLoad(async (options) => {
 .preset-item.selected { background: $primary-light; border-color: $primary; color: $primary; }
 .textarea { width: 100%; padding-left: 10px; padding-right: 10px; padding-top: 0; padding-bottom: 0; border: 1px solid $border; border-radius: 6px; font-size: 12px; min-height: 40px; line-height: 20px; margin-top: 6px; box-sizing: border-box; max-width: 100%; }
 
-/* 照片网格 */
-.photo-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; }
-.photo-i { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: $border-light; }
-.photo-i image { width: 100%; height: 100%; }
-.photo-d { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.photo-a { aspect-ratio: 1; border: 1px dashed $text-placeholder; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.photo-a-icon { font-size: 22px; color: $text-hint; line-height: 1; }
-.photo-a-t { font-size: 10px; color: $text-hint; margin-top: 2px; }
-
-/* 视频/语音按钮 */
-.media-row { display: flex; gap: 6px; margin-top: 6px; }
-.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 4px 0; border: 1px solid $border; border-radius: 4px; font-size: 10px; color: $text-secondary; position: relative; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.media-del { position: absolute; top: -6px; right: -6px; width: 16px; height: 16px; background: $danger; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
 .mr-label { font-size: 12px; font-weight: 600; color: $text-primary; }
 .mr-row { display: flex; gap: 6px; margin-top: 4px; }
 .mr-cell { flex: 1; min-width: 0; }
@@ -529,12 +655,17 @@ onLoad(async (options) => {
 .mr-inp { width: 100%; max-width: 100%; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 40px; line-height: 40px; border: 1px solid $border; border-radius: 6px; font-size: 13px; box-sizing: border-box; background: $bg-card; text-align: right; }
 
 /* 底部 */
-.bb { position: fixed; bottom: 0; left: 0; right: 0; background: $bg-card; border-top: 1px solid $border; padding: 10px 16px 20px; }
-.bb-status { font-size: 11px; color: $text-hint; margin-bottom: 6px; display: flex; align-items: center; }
-.bb-deadline { font-size: 11px; color: $primary; padding: 2px 8px; border: 1px dashed $primary-dim; border-radius: 4px; }
-.bb-rectifier { display: flex; gap: 6px; margin-bottom: 6px; }
-.bb-inp { flex: 1; padding-left: 8px; padding-right: 8px; padding-top: 0; padding-bottom: 0; height: 36px; line-height: 36px; border: 1px solid $border; border-radius: 6px; font-size: 12px; box-sizing: border-box; background: $bg-card; }
+.bb { position: fixed; bottom: 0; left: 0; right: 0; background: $bg-card; border-top: 1px solid $border; padding: 8px 16px 14px; }
+.bb-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.bb-summary-text { font-size: 12px; color: $text-secondary; }
+.bb-count { font-weight: 700; color: $danger; font-size: 14px; }
+.bb-clear-all { font-size: 11px; color: $text-hint; padding: 2px 6px; }
+.bb-rectifier { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.bb-rectifier-label { font-size: 11px; font-weight: 600; color: $text-primary; flex-shrink: 0; white-space: nowrap; }
+.bb-rectifier :deep(.rp-trigger) { height: 32px; line-height: 32px; font-size: 11px; }
 .bb-btns { display: flex; gap: 10px; }
 .bb-draft { flex: 1; text-align: center; padding: 10px; border: 1.5px solid $primary; border-radius: 8px; font-size: 13px; font-weight: 600; color: $primary; }
+.bb-draft:active { background: $primary-light; }
 .bb-submit { flex: 2; text-align: center; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 600; background: $primary; color: #fff; }
+.bb-submit:active { opacity: 0.85; }
 </style>

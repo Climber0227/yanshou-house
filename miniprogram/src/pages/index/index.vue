@@ -10,8 +10,8 @@
       </view>
     </view>
     <view class="notif" @click="goNotif">
-      <text class="notif-icon">🔔</text>
-      <view v-if="unread > 0" class="badge">{{ unread }}</view>
+      <text>通知</text>
+      <text v-if="unread > 0">({{ unread }})</text>
     </view>
   </view>
 
@@ -20,8 +20,8 @@
     <text class="hero-title">工作台</text>
   </view>
 
-  <!-- 统计卡片：2x2 毛玻璃网格 -->
-  <Skeleton v-if="loading" type="stat" :count="4" />
+  <!-- 统计卡片 -->
+  <view v-if="loading" class="page-loading"><text>加载中...</text></view>
   <view v-else class="stats-grid">
     <view class="stat-card" @click="switchTabTask">
       <text class="stat-lbl">总户数</text>
@@ -50,11 +50,9 @@
   <!-- 快速入口 -->
   <view class="quick-acts">
     <view class="qa-item" @click="goLibrary">
-      <text class="qa-icon">📋</text>
       <text class="qa-lbl">问题库</text>
     </view>
     <view class="qa-item" @click="switchTabTask">
-      <text class="qa-icon">📝</text>
       <text class="qa-lbl">全部任务</text>
     </view>
   </view>
@@ -62,11 +60,10 @@
   <!-- 我的待办 -->
   <view class="sec">
     <text class="sec-title">我的待办</text>
-    <text class="sec-more" @click="switchTabTask">全部 ›</text>
+    <text class="sec-more" @click="switchTabTask">全部</text>
   </view>
 
-  <Skeleton v-if="loading" type="card" :count="3" />
-  <template v-else>
+  <template v-if="!loading">
     <view v-for="i in myIssues" :key="i.id" class="card" @click="goDetail(i)">
       <view class="card-row">
         <view class="dot" :class="dotMap[i.status]"></view>
@@ -87,7 +84,6 @@ import { ref, computed, onMounted } from 'vue'
 import { onShow, onShareAppMessage } from '@dcloudio/uni-app'
 import { useUserStore } from '@/store/user'
 import { getStatistics, getRectifyTasks, getPendingReviews, getNotifications } from '@/api'
-import Skeleton from '@/components/Skeleton.vue'
 
 const store = useUserStore()
 const user = computed(() => store.user)
@@ -130,61 +126,48 @@ onShareAppMessage(() => ({ title: '分户验收 - 工作台', path: '/pages/inde
 </script>
 
 <style scoped>
-.page { padding: 0 16px 20px; }
+.page { padding: 0 12px 20px; }
+.page-loading { padding: 60px 0; text-align: center; color: #999; font-size: 13px; }
 
-/* 顶部 */
-.top-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0 0; }
+.top-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
 .user-pill { display: flex; align-items: center; gap: 8px; }
-.avatar { width: 30px; height: 30px; border-radius: 8px; background: #006FFD; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
-.user-name { font-size: 13px; font-weight: 600; color: #1F2024; display: block; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
-.user-role { font-size: 10px; color: #8E8E93; }
-.notif { position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
-.notif-icon { font-size: 18px; }
-.badge { position: absolute; top: -2px; right: -2px; background: #FF3B30; color: #fff; font-size: 9px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 0 4px; font-weight: 600; }
+.avatar { width: 30px; height: 30px; background: #0D3B66; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: 4px; }
+.user-name { font-size: 13px; font-weight: 600; color: #333; display: block; }
+.user-role { font-size: 10px; color: #999; }
+.notif { font-size: 13px; color: #0D3B66; }
 
-/* 大标题 */
-.hero { padding: 4px 0 16px; }
-.hero-title { font-size: 28px; font-weight: 700; color: #000; letter-spacing: -0.3px; }
+.hero { padding: 4px 0 12px; }
+.hero-title { font-size: 22px; font-weight: 700; color: #333; }
 
-/* 统计卡片 2x2 */
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
-.stat-card { background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.7); animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.stat-card:active { transform: scale(0.97); transition: transform 0.15s; }
-.stat-card:nth-child(1) { animation-delay: 0.05s; }
-.stat-card:nth-child(2) { animation-delay: 0.1s; }
-.stat-card:nth-child(3) { animation-delay: 0.15s; }
-.stat-card:nth-child(4) { animation-delay: 0.2s; }
-.stat-lbl { font-size: 12px; color: #8E8E93; font-weight: 500; margin-bottom: 4px; letter-spacing: 0.2px; }
-.stat-val { font-size: 26px; font-weight: 700; color: #000; letter-spacing: -0.5px; line-height: 1.1; }
-.stat-val.blue { color: #007AFF; }
-.stat-val.green { color: #34C759; }
-.stat-sub { font-size: 11px; color: #8E8E93; margin-top: 2px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.stat-card { padding: 12px; border: 1px solid #e0e0e0; border-radius: 6px; }
+.stat-lbl { font-size: 11px; color: #999; display: block; margin-bottom: 2px; }
+.stat-val { font-size: 22px; font-weight: 700; color: #333; }
+.stat-val.blue { color: #0D3B66; }
+.stat-val.green { color: #2E7D32; }
+.stat-sub { font-size: 10px; color: #999; margin-top: 2px; display: block; }
 
-/* 进度条 */
-.progress-bar-bg { height: 3px; background: rgba(118,118,128,0.12); border-radius: 2px; margin: 4px 0 16px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: #007AFF; border-radius: 2px; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.progress-bar-bg { height: 3px; background: #eee; margin: 4px 0 12px; border-radius: 2px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #0D3B66; }
 
-/* 快速入口 */
-.quick-acts { display: flex; gap: 10px; margin-bottom: 20px; }
-.qa-item { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; background: rgba(255,255,255,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid rgba(255,255,255,0.7); }
-.qa-item:active { transform: scale(0.97); transition: transform 0.15s; }
-.qa-icon { font-size: 18px; }
-.qa-lbl { font-size: 13px; font-weight: 600; color: #007AFF; }
+.quick-acts { display: flex; gap: 8px; margin-bottom: 16px; }
+.qa-item { flex: 1; text-align: center; padding: 10px; border: 1px solid #e0e0e0; border-radius: 6px; }
+.qa-item:active { border-color: #0D3B66; }
+.qa-lbl { font-size: 13px; font-weight: 500; color: #0D3B66; }
 
-/* 待办列表 */
-.sec { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.sec-title { font-size: 17px; font-weight: 600; color: #000; letter-spacing: -0.2px; }
-.sec-more { font-size: 13px; color: #007AFF; font-weight: 500; }
+.sec { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.sec-title { font-size: 14px; font-weight: 600; color: #333; }
+.sec-more { font-size: 13px; color: #0D3B66; }
 
-.card-row { display: flex; align-items: center; gap: 10px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
-.dot-warn { background: #FF9500; }
-.dot-blue { background: #007AFF; }
-.dot-purple { background: #AF52DE; }
-.dot-green { background: #34C759; }
-.card-body { flex: 1; min-width: 0; }
-.card-title { font-size: 14px; font-weight: 600; color: #000; display: block; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.card-meta { font-size: 12px; color: #8E8E93; margin-top: 2px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-row { display: flex; align-items: center; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-warn { background: #CC7B00; }
+.dot-blue { background: #0D3B66; }
+.dot-purple { background: #7C3AED; }
+.dot-green { background: #2E7D32; }
+.card-body { flex: 1; }
+.card-title { font-size: 13px; font-weight: 500; color: #333; display: block; }
+.card-meta { font-size: 11px; color: #999; display: block; margin-top: 2px; }
 
-.empty { padding: 40px 0; text-align: center; color: #8E8E93; font-size: 13px; }
+.empty { padding: 40px 0; text-align: center; color: #999; font-size: 13px; }
 </style>

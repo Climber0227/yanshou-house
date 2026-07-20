@@ -45,7 +45,7 @@ async function submitRectify() {
   if (!measure.value) { uni.showToast({ title: '请填写整改措施', icon: 'none' }); return }
   if (photos.value.length === 0) { uni.showToast({ title: '请上传整改后照片', icon: 'none' }); return }
   const res = await submitApi(issueId.value, { measure: measure.value, photos: photos.value, remark: remark.value })
-  if (res.code === 0) { uni.showToast({ title: '提交成功，待复查', icon: 'success' }); setTimeout(() => uni.switchTab({ url: '/pages/task-list/task-list' }), 1000) }
+  if (res.code === 0) { uni.showToast({ title: '提交成功，待复查', icon: 'success' }); setTimeout(() => uni.navigateBack(), 1200) }
 }
 
 onLoad((options) => {
@@ -63,12 +63,6 @@ onLoad((options) => {
 
 .textarea { width: 100%; padding-left: $sp-md; padding-right: $sp-md; padding-top: 0; padding-bottom: 0; border: 1px solid $border; border-radius: $radius-sm; font-size: $fs-sm; min-height: 80px; line-height: 1.5; box-sizing: border-box; }
 
-.photo-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.photo-i { position: relative; aspect-ratio: 1; border-radius: $radius-sm; overflow: hidden; background: $bg-tag; }
-.photo-i image { width: 100%; height: 100%; }
-.photo-d { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.photo-a { aspect-ratio: 1; border: 1px dashed $text-placeholder; border-radius: $radius-sm; display: flex; align-items: center; justify-content: center; }
-.photo-a-icon { font-size: 22px; color: $text-hint; }
 
 .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px; background: $bg-card; border-top: 1px solid $border; }
 </style>

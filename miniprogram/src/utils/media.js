@@ -1,9 +1,9 @@
 // 多媒体工具 — 图片压缩 + 并发控制
 
-// 压缩图片（微信小程序）
+// 压缩图片（跨平台，uni.compressImage 自动适配各端）
 export function compressImage(filePath) {
   return new Promise((resolve) => {
-    wx.compressImage({
+    uni.compressImage({
       src: filePath,
       quality: 70,
       success: (res) => resolve(res.tempFilePath),

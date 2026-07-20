@@ -1,39 +1,8 @@
 @import '@/styles/tokens.scss';
 
-// === 微动画关键帧 ===
-@keyframes cardAppear {
-  from { opacity: 0; transform: translateY(16px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes countUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-// === 全局过渡 ===
+// === 极简基础样式 ===
 page, .page {
-  background: linear-gradient(180deg, #DBE8FF 0%, #EEF4FF 200px, #F5F7FA 55%, #E8ECF2 100%);
+  background: $bg-page;
   color: $text-primary;
   font-size: $fs-md;
   line-height: 1.5;
@@ -44,113 +13,70 @@ page, .page {
   overflow-x: hidden;
 }
 
-// iOS 风格分段标题（带左边色条）
+// 分段标题
 .sec-title {
-  font-size: 17px;
-  font-weight: 700;
-  color: #000;
-  letter-spacing: -0.2px;
-  padding-left: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-primary;
+  padding-left: 10px;
   position: relative;
-  line-height: 1.3;
-
+  line-height: 1.4;
   &::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 2px;
-    bottom: 2px;
-    width: 4px;
+    top: 3px;
+    bottom: 3px;
+    width: 3px;
     border-radius: 2px;
-    background: linear-gradient(180deg, $primary, rgba(0, 111, 253, 0.3));
+    background: $primary;
   }
 }
 
-// === 文本省略（多页共用）===
 .text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-// 所有卡片添加微动效（显式列出卡片变体，避免匹配 .card-top .card-meta 等子元素）
-.card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
-  animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
 // 按钮点击反馈
 .btn-primary, .btn-outline, [class*="btn-"], [class*="action-card"] {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s ease;
 }
 .btn-primary:active, .btn-outline:active {
-  transform: scale(0.96);
-  opacity: 0.9;
-}
-
-// 列表项逐条淡入
-.i-row, .issue-row, .tl-item, .recent-item, .select-row {
-  animation: cardAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-// 每项延迟递增，产生级联效果
-.card:nth-child(1), .i-row:nth-child(1), .issue-row:nth-child(1) { animation-delay: 0.02s; }
-.card:nth-child(2), .i-row:nth-child(2), .issue-row:nth-child(2) { animation-delay: 0.06s; }
-.card:nth-child(3), .i-row:nth-child(3), .issue-row:nth-child(3) { animation-delay: 0.10s; }
-.card:nth-child(4), .i-row:nth-child(4), .issue-row:nth-child(4) { animation-delay: 0.14s; }
-.card:nth-child(5), .i-row:nth-child(5), .issue-row:nth-child(5) { animation-delay: 0.18s; }
-.card:nth-child(6), .i-row:nth-child(6), .issue-row:nth-child(6) { animation-delay: 0.22s; }
-.card:nth-child(n+7), .i-row:nth-child(n+7), .issue-row:nth-child(n+7) { animation-delay: 0.26s; }
-
-// 通知徽章呼吸动画
-.badge {
-  animation: pulse 2s ease-in-out infinite;
-}
-
-// 统计数字上浮
-.stat-num {
-  animation: countUp 0.5s ease both;
-}
-
-// 标签切换动画
-.seg-item, .seg-item-lg {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.85;
 }
 
 // 底部操作栏
 .submit-bar, .bb {
-  animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: $bg-card;
+  border-top: 1px solid $border;
 }
 
-// 微信小程序原生 input/textarea 不兼容 Web box-sizing。
-// 垂直 padding 会向内压缩文字区域导致截断——全局禁止 vertical padding。
-// 各组件只设 padding-left/right，用 height 控制整体高度。
+// 微信小程序兼容
 input {
   padding-top: 0;
   padding-bottom: 0;
   height: 44px;
   line-height: 44px;
 }
-
 textarea {
   padding-top: 0;
   padding-bottom: 0;
   min-height: 60px;
 }
 
-// 毛玻璃卡片（所有卡片共享，显式列出变体避免匹配子元素）
-.card, .card-accent, .m-card, .check-card, .qr-card, .info-card {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  border: 1px solid rgba(255,255,255,0.7);
+// 卡片 - 纯白极简
+.card, .card-accent, .m-card, .check-card, .info-card, .stat-card {
+  background: $bg-card;
+  border-radius: $radius-md;
+  border: 1px solid $border;
 }
 
 // 信息卡片（带左色条）
 .card-accent {
   position: relative;
   padding: $sp-lg;
-
   &::before {
     content: '';
     position: absolute;
@@ -163,12 +89,10 @@ textarea {
   }
 }
 
-// 普通卡片
 .card {
   padding: $sp-lg;
 }
 
-// 浅色操作区
 .action-area {
   background: $primary-light;
   border-radius: $radius-md;
@@ -184,49 +108,42 @@ textarea {
   font-weight: 600;
   line-height: 1.6;
 }
-
-.tag-pending { background: #FFF3E0; color: #E65100; }
+.tag-pending { background: #FFF3E0; color: #CC7B00; }
 .tag-progress { background: $primary-light; color: $primary; }
 .tag-review { background: #F3E8FF; color: #7C3AED; }
 .tag-closed { background: #E8F5E9; color: #2E7D32; }
-.tag-rejected { background: #FFEBEE; color: #ED3241; }
+.tag-rejected { background: #FFEBEE; color: #D32F2F; }
 
-// 状态标签颜色过渡
-.tag, .tag-pending, .tag-progress, .tag-review, .tag-closed, .tag-rejected {
-  transition: all 0.3s ease;
-}
-
-// 主按钮
+// 主按钮 - 深蓝底白字
 .btn-primary {
   background: $primary;
   color: #fff;
   border: none;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   padding: 12px 20px;
   font-size: $fs-md;
   font-weight: 600;
   text-align: center;
 }
+.btn-primary:active { opacity: 0.85; }
 
 .btn-outline {
   background: transparent;
   color: $primary;
   border: 1.5px solid $primary;
-  border-radius: $radius-md;
+  border-radius: $radius-sm;
   padding: 10px 20px;
   font-size: $fs-sm;
   font-weight: 600;
   text-align: center;
 }
 
-// 分割线
 .divider {
   height: 1px;
   background: $border;
   margin: $sp-md 0;
 }
 
-// 空状态
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -237,21 +154,30 @@ textarea {
   font-size: $fs-sm;
 }
 
-// 页面内边距
 .page {
   padding: 0 $sp-lg 20px;
 }
 
-// === iOS 分段控件 ===
+// 照片网格
+.photo-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 6px; }
+.photo-i { position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: $border-light; }
+.photo-i image { width: 100%; height: 100%; }
+.photo-d { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; z-index: 1; }
+.photo-a { aspect-ratio: 1; border: 1px dashed $text-placeholder; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.photo-a-icon { font-size: 22px; color: $text-hint; line-height: 1; }
+.photo-a-t { font-size: 10px; color: $text-hint; margin-top: 2px; }
+
+.media-row { display: flex; gap: 6px; margin-top: 6px; }
+.media-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 2px; padding: 6px 0; border: 1px solid $border; border-radius: 6px; font-size: 10px; color: $text-secondary; position: relative; }
+
+// 分段控件
 .seg {
   display: flex;
   background: rgba(118, 118, 128, 0.12);
-  border-radius: 9px;
+  border-radius: 8px;
   padding: 2px;
   margin-bottom: 16px;
-  animation: cardAppear 0.5s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-
 .seg-item {
   flex: 1;
   text-align: center;
@@ -259,25 +185,10 @@ textarea {
   font-size: 13px;
   font-weight: 500;
   color: #8E8E93;
-  border-radius: 7px;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 6px;
 }
-
 .seg-item.active {
   background: #fff;
-  color: #007AFF;
+  color: $primary;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
-// === Skeleton shimmer ===
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-// === Toast 顶部滑入 ===
-@keyframes toastDrop {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
 }

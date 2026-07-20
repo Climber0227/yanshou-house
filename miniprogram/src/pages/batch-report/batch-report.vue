@@ -3,14 +3,17 @@
     <!-- 选择楼栋 -->
     <view class="form-group">
       <text class="form-label">选择楼栋 <text class="req">*</text></text>
-      <scroll-view scroll-x class="b-scroll">
+      <view class="b-grid">
         <view v-for="b in buildings" :key="b.id"
-          class="b-chip" :class="{ active: selB === b.id }"
+          class="b-card" :class="{ active: selB === b.id }"
           @click="pickBuilding(b)">
-          <text class="b-n">{{ b.name }}</text>
-          <text class="b-c">{{ b.totalHouseholds }}户</text>
+          <view class="b-card-top">
+            <text class="b-card-name">{{ b.name }}</text>
+            <text class="b-card-icon">楼</text>
+          </view>
+          <text class="b-card-cnt">{{ b.totalHouseholds }} 户</text>
         </view>
-      </scroll-view>
+      </view>
       <view v-if="buildings.length === 0" class="empty"><text>暂无楼栋数据</text></view>
     </view>
 
@@ -185,14 +188,16 @@ onMounted(() => { loadBuildings(); loadPresets() })
 .form-hint { font-size: $fs-xs; color: $text-hint; }
 .req { color: $danger; }
 
-/* 楼栋横向滚动 */
-.b-scroll { white-space: nowrap; padding-bottom: 4px; }
-.b-scroll::-webkit-scrollbar { display: none; }
-.b-chip { display: inline-flex; flex-direction: column; align-items: center; padding: 12px 20px; border: 1px solid $border; border-radius: $radius-md; margin-right: 8px; background: $bg-card; }
-.b-chip.active { border-color: $primary; background: $primary-light; }
-.b-chip.active .b-n { color: $primary; }
-.b-n { font-size: 15px; font-weight: 600; color: $text-primary; }
-.b-c { font-size: 10px; color: $text-hint; margin-top: 2px; }
+/* 楼栋网格 */
+.b-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.b-card { display: flex; flex-direction: column; padding: $sp-lg; background: $bg-card; border: 1px solid $border; border-radius: $radius-md; gap: 6px; }
+.b-card:active { transform: scale(0.97); transition: transform 0.15s; }
+.b-card.active { border-color: $primary; background: $primary-light; }
+.b-card.active .b-card-name { color: $primary; }
+.b-card-top { display: flex; justify-content: space-between; align-items: center; }
+.b-card-name { font-size: 17px; font-weight: 700; color: $text-primary; }
+.b-card-icon { font-size: 20px; }
+.b-card-cnt { font-size: 11px; color: $text-hint; }
 
 /* 户勾选 */
 .hh-g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -210,14 +215,7 @@ onMounted(() => { loadBuildings(); loadPresets() })
 
 .input { width: 100%; padding-left: $sp-md; padding-right: $sp-md; padding-top: 0; padding-bottom: 0; height: 44px; line-height: 44px; border: 1px solid $border; border-radius: $radius-sm; font-size: $fs-sm; box-sizing: border-box; }
 
-/* 拍照 */
-.photo-g { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.photo-i { position: relative; aspect-ratio: 1; border-radius: $radius-sm; overflow: hidden; background: $bg-tag; }
-.photo-i image { width: 100%; height: 100%; }
-.photo-d { position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; background: rgba(0,0,0,.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.photo-a { aspect-ratio: 1; border: 1px dashed $text-placeholder; border-radius: $radius-sm; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.photo-a-icon { font-size: 22px; color: $text-hint; line-height: 1; }
-.photo-a-t { font-size: 10px; color: $text-hint; margin-top: 2px; }
+
 
 .submit-bar { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px; background: $bg-card; border-top: 1px solid $border; }
 </style>

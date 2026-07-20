@@ -2,6 +2,7 @@
 // 模拟后端 API 响应，返回与 API 合同一致的格式
 
 import data from './data'
+import { INSPECTION_FORMS } from '@/config/inspection-forms'
 
 const delay = (ms = 200) => new Promise(r => setTimeout(r, ms))
 const ok = (res) => ({ code: 0, message: 'success', data: res })
@@ -80,7 +81,8 @@ export async function mockGetHouseholdDetail(id) {
   const h = data.mockHouseholds.find(h => h.id === id)
   if (!h) return fail(404, '户不存在')
   const issues = data.mockIssues.filter(i => i.householdId === id)
-  return ok({ ...h, issues })
+  const inspectionStatus = h.inspectionStatus || { visual: 'pending', measure: 'pending', public: 'pending' }
+  return ok({ ...h, issues, inspectionStatus })
 }
 
 export async function mockGetHouseholdQrcode(id) {
@@ -89,6 +91,16 @@ export async function mockGetHouseholdQrcode(id) {
 }
 
 // ========== 问题上报 ==========
+export async function mockGetFormItems(type) {
+  await delay(100)
+  const form = INSPECTION_FORMS[type]
+  if (!form) return fail(400, '无效的检查类型')
+  if (type === 'visual') return ok({ items: form.items, rooms: [] })
+  if (type === 'measure') return ok({ items: form.items, rooms: form.rooms || [] })
+  if (type === 'public') return ok({ items: form.items, rooms: [] })
+  return ok(form)
+}
+
 export async function mockGetIssuePresets(type) {
   await delay(150)
   const presets = data.issuePresets[type] || []
@@ -175,10 +187,30 @@ export async function mockBatchReportIssues(form) {
   return ok({ importedCount: count, failedCount: 0, errors: [] })
 }
 
-export async function mockAcceptHousehold(householdId, type) {
+export async function mockAcceptHousehold(householdId, type, result) {
   await delay(200)
+  const hh = data.mockHouseholds.find(h => h.id === householdId)
+  if (hh) {
+    if (!hh.inspectionStatus) hh.inspectionStatus = { visual: 'pending', measure: 'pending', public: 'pending' }
+    // type='all' 表示整户审核（问题都已闭环后的最终确认）
+    if (type === 'all') {
+      hh.acceptanceStatus = 'completed'
+      hh.acceptanceStatusName = '已完成'
+    } else {
+      // 更新对应 TAB 状态：passed（全部合格）或 has_issues（有问题）
+      hh.inspectionStatus[type] = result || 'passed'
+      // 三 TAB 全 passed → 无问题验收完成
+      const allPassed = hh.inspectionStatus.visual === 'passed' && hh.inspectionStatus.measure === 'passed' && hh.inspectionStatus.public === 'passed'
+      if (allPassed) {
+        hh.acceptanceStatus = 'completed'
+        hh.acceptanceStatusName = '已完成（无问题）'
+      }
+    }
+  }
   return ok({
-    acceptanceProgress: { visual: 'passed', measure: 'pending', public: 'pending' }
+    inspectionStatus: hh?.inspectionStatus || { visual: 'pending', measure: 'pending', public: 'pending' },
+    acceptanceStatus: hh?.acceptanceStatus || 'pending',
+    acceptanceStatusName: hh?.acceptanceStatusName || '验收中'
   })
 }
 
